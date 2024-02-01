@@ -32,11 +32,21 @@ const Teams = () => {
 
 	return (
 		<>
-			<ul>
+			<div className='container flex flex-wrap gap-12 justify-center items-center'>
 				{teamData.map(team => (
-					<li key={team.teamID}>{`${team.teamCity} ${team.teamName}`}</li>
+					<div
+						key={team.teamID}
+						className='flex flex-col justify-center items-center gap-2 text-sm'
+					>
+						<img
+							src={team.mlbLogo1}
+							alt={`${team.teamCity} ${team.teamName}`}
+							className='md:h-12 md:w-12 h-8 w-8'
+						/>
+						<p>{team.teamName}</p>
+					</div>
 				))}
-			</ul>
+			</div>
 		</>
 	)
 }
