@@ -3,7 +3,7 @@ import { Button, Modal, Box, Typography, Avatar } from '@mui/material'
 import Navbar from '../components/Navbar'
 import TeamStats from '../components/TeamStats'
 import RosterTable from '../components/RosterTable'
-import axios from 'axios'
+import TopPerformers from '../components/TopPerformers'
 
 const style = {
 	position: 'absolute',
@@ -27,6 +27,7 @@ const RosterPage = () => {
 		<>
 			<Navbar />
 			<TeamStats />
+			<TopPerformers />
 			<RosterTable
 				setPlayerData={setPlayerData}
 				handlePlayerModalOpen={handlePlayerModalOpen}

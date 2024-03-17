@@ -42,11 +42,8 @@ const Teams = () => {
 					<CircularProgress />
 				) : (
 					teamData.map(team => (
-						<Link to={`/team/${team.teamAbv}`}>
-							<div
-								key={team.teamID}
-								className='flex flex-col items-center justify-center gap-2 text-sm'
-							>
+						<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
+							<div className='flex flex-col items-center justify-center gap-2 text-sm'>
 								<img
 									src={team.mlbLogo1}
 									alt={`${team.teamCity} ${team.teamName}`}
