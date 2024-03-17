@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
-import { Box } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 
 const TeamStats = () => {
 	const [teamData, setTeamData] = useState({})
@@ -39,26 +39,32 @@ const TeamStats = () => {
 
 	return (
 		<div className='container mx-auto my-8'>
-			<div className='flex gap-4 p-2 border border-black'>
-				<img
-					src={teamData.espnLogo1}
-					alt={teamData.teamAbv}
-					width={108}
-					height={108}
-				/>
+			{!Object.keys(teamData).length ? (
+				<Box display='flex' alignItems='center' justifyContent='center'>
+					<CircularProgress />
+				</Box>
+			) : (
+				<div className='flex gap-4 p-2 border border-black'>
+					<img
+						src={teamData.espnLogo1}
+						alt={teamData.teamAbv}
+						width={108}
+						height={108}
+					/>
 
-				<div className='flex flex-col justify-center gap-2'>
-					<h3>
-						{teamData.teamCity} {teamData.teamName}
-					</h3>
-					<p>
-						{teamData.conferenceAbv} {teamData.division}
-					</p>
-					<p>
-						({teamData.wins} - {teamData.loss})
-					</p>
+					<div className='flex flex-col justify-center gap-2'>
+						<h3>
+							{teamData.teamCity} {teamData.teamName}
+						</h3>
+						<p>
+							{teamData.conferenceAbv} {teamData.division}
+						</p>
+						<p>
+							({teamData.wins} - {teamData.loss})
+						</p>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	)
 }

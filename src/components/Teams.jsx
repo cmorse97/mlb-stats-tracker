@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { CircularProgress } from '@mui/material'
 import axios from 'axios'
 
 const Teams = () => {
@@ -37,21 +38,25 @@ const Teams = () => {
 	return (
 		<>
 			<div className='container flex flex-wrap items-center justify-center gap-12'>
-				{teamData.map(team => (
-					<Link to={`/team/${team.teamAbv}`}>
-						<div
-							key={team.teamID}
-							className='flex flex-col items-center justify-center gap-2 text-sm'
-						>
-							<img
-								src={team.mlbLogo1}
-								alt={`${team.teamCity} ${team.teamName}`}
-								className='w-8 h-8 md:h-12 md:w-12'
-							/>
-							<p>{team.teamName}</p>
-						</div>
-					</Link>
-				))}
+				{!teamData.length ? (
+					<CircularProgress />
+				) : (
+					teamData.map(team => (
+						<Link to={`/team/${team.teamAbv}`}>
+							<div
+								key={team.teamID}
+								className='flex flex-col items-center justify-center gap-2 text-sm'
+							>
+								<img
+									src={team.mlbLogo1}
+									alt={`${team.teamCity} ${team.teamName}`}
+									className='w-8 h-8 md:h-12 md:w-12'
+								/>
+								<p>{team.teamName}</p>
+							</div>
+						</Link>
+					))
+				)}
 			</div>
 		</>
 	)

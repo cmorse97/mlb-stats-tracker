@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, Box, Typography } from '@mui/material'
+import { Button, CircularProgress, Box, Typography } from '@mui/material'
 import axios from 'axios'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -47,46 +47,52 @@ export default function RosterTable({ setPlayerData, handlePlayerModalOpen }) {
 
 	return (
 		<div className='container mx-auto my-8'>
-			<TableContainer component={Paper}>
-				<Table sx={{ minWidth: 650 }} aria-label='simple table'>
-					<TableHead>
-						<TableRow>
-							<TableCell>Position</TableCell>
-							<TableCell>Name</TableCell>
-							<TableCell>Number</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{rosterData.map(player => (
-							<TableRow
-								key={player.playerID}
-								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-							>
-								<TableCell>{player.pos}</TableCell>
-								<TableCell align='left'>
-									<Button
-										onClick={() => {
-											setPlayerData(player)
-											handlePlayerModalOpen()
-										}}
-										disabled={Object.keys(player).length === 0}
-									>
-										<img
-											src={player.mlbHeadshot}
-											alt={player.longName}
-											width={36}
-											height={36}
-											className='mr-2'
-										/>
-										<Typography color='black'>{player.longName}</Typography>
-									</Button>
-								</TableCell>
-								<TableCell>{player.jerseyNum}</TableCell>
+			{!rosterData.length ? (
+				<Box display='flex' alignItems='center' justifyContent='center'>
+					<CircularProgress />
+				</Box>
+			) : (
+				<TableContainer component={Paper}>
+					<Table sx={{ minWidth: 650 }} aria-label='simple table'>
+						<TableHead>
+							<TableRow>
+								<TableCell>Position</TableCell>
+								<TableCell>Name</TableCell>
+								<TableCell>Number</TableCell>
 							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
+						</TableHead>
+						<TableBody>
+							{rosterData.map(player => (
+								<TableRow
+									key={player.playerID}
+									sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+								>
+									<TableCell>{player.pos}</TableCell>
+									<TableCell align='left'>
+										<Button
+											onClick={() => {
+												setPlayerData(player)
+												handlePlayerModalOpen()
+											}}
+											disabled={Object.keys(player).length === 0}
+										>
+											<img
+												src={player.mlbHeadshot}
+												alt={player.longName}
+												width={36}
+												height={36}
+												className='mr-2'
+											/>
+											<Typography color='black'>{player.longName}</Typography>
+										</Button>
+									</TableCell>
+									<TableCell>{player.jerseyNum}</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
+			)}
 		</div>
 	)
 }
