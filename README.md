@@ -1,7 +1,14 @@
 # MLB Stats Tracker
 
-User stores:
+## Priority Tasks
 
-1. A user should be able click a team logo and view that team's roster stats
-2. A user should be able to sort stats via each column (player name, games played, hr, avg, etc.)
-3. A user should be able to click a player name and load that player's profile (modal)
+When you click a player name, load their player data - completed
+Make a nav menu so that user can go back to home page from roster page
+On roster page, add Team Logo and Name and current Team Stats
+
+## Wishlist Tasks
+
+Make modal pretty and display player details and stats - pending
+Graph player projections
+Graph player recent performance
+Top stories and baseball news on homepage

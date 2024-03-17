@@ -1,10 +1,33 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import Root from './routes/root.jsx'
+import ErrorPage from './routes/ErrorPage.jsx'
+import RosterPage from './routes/RosterPage.jsx'
+import PlayerProfile from './routes/PlayerProfile.jsx'
 import './index.css'
 
+const router = createBrowserRouter([
+	{
+		path: '/',
+		element: <Root />,
+		errorElement: <ErrorPage />
+	},
+	{
+		path: '/team/:teamAbv',
+		element: <RosterPage />,
+		errorElement: <ErrorPage />,
+		children: [
+			{
+				path: ':playerID',
+				element: <PlayerProfile />
+			}
+		]
+	}
+])
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+	<React.StrictMode>
+		<RouterProvider router={router} />
+	</React.StrictMode>
 )

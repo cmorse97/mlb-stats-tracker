@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 
 const Teams = () => {
@@ -8,7 +9,10 @@ const Teams = () => {
 		const fetchData = async () => {
 			axios
 				.get(apiUrl, options)
-				.then(response => setTeamData(response.data.body))
+				.then(response => {
+					const teams = response.data.body
+					setTeamData(teams)
+				})
 				.catch(err => console.log(err))
 		}
 
@@ -32,19 +36,21 @@ const Teams = () => {
 
 	return (
 		<>
-			<div className='container flex flex-wrap gap-12 justify-center items-center'>
+			<div className='container flex flex-wrap items-center justify-center gap-12'>
 				{teamData.map(team => (
-					<div
-						key={team.teamID}
-						className='flex flex-col justify-center items-center gap-2 text-sm'
-					>
-						<img
-							src={team.mlbLogo1}
-							alt={`${team.teamCity} ${team.teamName}`}
-							className='md:h-12 md:w-12 h-8 w-8'
-						/>
-						<p>{team.teamName}</p>
-					</div>
+					<Link to={`/team/${team.teamAbv}`}>
+						<div
+							key={team.teamID}
+							className='flex flex-col items-center justify-center gap-2 text-sm'
+						>
+							<img
+								src={team.mlbLogo1}
+								alt={`${team.teamCity} ${team.teamName}`}
+								className='w-8 h-8 md:h-12 md:w-12'
+							/>
+							<p>{team.teamName}</p>
+						</div>
+					</Link>
 				))}
 			</div>
 		</>
