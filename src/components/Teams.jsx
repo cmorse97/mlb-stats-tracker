@@ -4,20 +4,20 @@ import { CircularProgress } from '@mui/material'
 import axios from 'axios'
 
 const Teams = () => {
-	const [teamData, setTeamData] = useState([])
+	const [teamsData, setTeamsData] = useState([])
 
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchTeamsData = async () => {
 			axios
 				.get(apiUrl, options)
 				.then(response => {
 					const teams = response.data.body
-					setTeamData(teams)
+					setTeamsData(teams)
 				})
 				.catch(err => console.log(err))
 		}
 
-		fetchData()
+		fetchTeamsData()
 	}, [])
 
 	const options = {
@@ -38,10 +38,10 @@ const Teams = () => {
 	return (
 		<>
 			<div className='container flex flex-wrap items-center justify-center gap-12'>
-				{!teamData.length ? (
+				{!teamsData.length ? (
 					<CircularProgress />
 				) : (
-					teamData.map(team => (
+					teamsData.map(team => (
 						<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
 							<div className='flex flex-col items-center justify-center gap-2 text-sm'>
 								<img

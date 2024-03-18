@@ -8,7 +8,7 @@ const TeamStats = () => {
 	const { teamAbv } = useParams()
 
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchTeamData = async () => {
 			axios
 				.get(apiUrl, options)
 				.then(response => {
@@ -19,7 +19,7 @@ const TeamStats = () => {
 				.catch(err => console.log(err))
 		}
 
-		fetchData()
+		fetchTeamData()
 	}, [])
 
 	const options = {
@@ -44,7 +44,7 @@ const TeamStats = () => {
 					<CircularProgress />
 				</Box>
 			) : (
-				<div className='flex gap-4 p-2 border border-black'>
+				<div className='flex gap-8 p-2 border border-black'>
 					<img
 						src={teamData.espnLogo1}
 						alt={teamData.teamAbv}
@@ -62,6 +62,10 @@ const TeamStats = () => {
 						<p>
 							({teamData.wins} - {teamData.loss})
 						</p>
+					</div>
+
+					<div className='flex items-center justify-center flex-1 gap-2 border border-red-50'>
+						No 2024 team stats, season starting soon...
 					</div>
 				</div>
 			)}
