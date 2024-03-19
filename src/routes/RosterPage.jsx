@@ -16,6 +16,12 @@ import Navbar from '../components/Navbar'
 import TeamStats from '../components/TeamStats'
 import RosterTable from '../components/RosterTable'
 import TopPerformers from '../components/TopPerformers'
+import {
+	calculateSlugging,
+	calculatePlateAppearances,
+	calculateOBP,
+	calculateOPS
+} from '../utils/hittingStatsCalculations'
 
 const style = {
 	position: 'absolute',
@@ -34,45 +40,6 @@ const RosterPage = () => {
 	const [playerModalOpen, setPlayerModalOpen] = useState(false)
 	const handlePlayerModalOpen = () => setPlayerModalOpen(true)
 	const handlePlayerModalClose = () => setPlayerModalOpen(false)
-	const calculateSlugging = () => {
-		// (1Bx1 + 2Bx2 + 3Bx3 + HRx4)/AB
-		const single =
-			playerData?.stats.Hitting.H -
-			playerData?.stats.Hitting['2B'] -
-			playerData?.stats.Hitting['3B'] -
-			playerData?.stats.Hitting.HR
-		const double = playerData?.stats.Hitting['2B'] * 2
-		const triple = playerData?.stats.Hitting['3B'] * 3
-		const homerun = playerData?.stats.Hitting.HR * 4
-		const ab = playerData?.stats.Hitting.AB
-		const slg = (single + double + triple + homerun) / ab
-		return slg.toFixed(3)
-	}
-	const calculatePlateAppearances = () => {
-		const ab = Number(playerData?.stats.Hitting.AB)
-		const bb = Number(playerData?.stats.Hitting.BB)
-		const ibb = Number(playerData?.stats.Hitting.IBB)
-		const sac = Number(playerData?.stats.Hitting.SAC)
-		const hbp = Number(playerData?.stats.Hitting.HBP)
-		const sf = Number(playerData?.stats.Hitting.SF)
-		const gidp = Number(playerData?.stats.Hitting.GIDP)
-		const pa = ab + bb + ibb + sac + hbp + sf + gidp
-		return pa
-	}
-	const calculateOBP = () => {
-		const hits = Number(playerData?.stats.Hitting.H)
-		const walks = Number(playerData?.stats.Hitting.BB)
-		const hitByPitch = Number(playerData?.stats.Hitting.HBP)
-		const ab = Number(playerData?.stats.Hitting.AB)
-		const sf = Number(playerData?.stats.Hitting.SF)
-		const obp = (hits + walks + hitByPitch) / (ab + walks + hitByPitch + sf)
-		return obp.toFixed(3)
-	}
-	const calculateOPS = () => {
-		const obp = Number(calculateOBP())
-		const slg = Number(calculateSlugging())
-		return obp + slg
-	}
 
 	return (
 		<>
@@ -91,21 +58,14 @@ const RosterPage = () => {
 					aria-describedby='modal-modal-description'
 				>
 					<Box sx={style}>
-						<Box
-							display='flex'
-							gap={4}
-							p={2}
-							sx={{
-								border: '2px solid black'
-							}}
-						>
+						<Box display='flex' gap={4} p={2}>
 							<Box
 								display='flex'
 								alignItems='center'
 								justifyContent='center'
 								gap={2}
 								p={2}
-								sx={{ flexDirection: 'column', border: '2px solid red' }}
+								sx={{ flexDirection: 'column' }}
 							>
 								<Avatar
 									alt={playerData?.longName}
@@ -119,7 +79,7 @@ const RosterPage = () => {
 							<Box
 								display='flex'
 								justifyContent='center'
-								sx={{ flexDirection: 'column', border: '2px solid green' }}
+								sx={{ flexDirection: 'column' }}
 							>
 								{/* Player information, ex: DOB, height, weight */}
 								<p>
@@ -146,46 +106,50 @@ const RosterPage = () => {
 									{playerData?.bDay}
 								</p>
 							</Box>
-							<Button
-								onClick={handlePlayerModalClose}
-								position='absolute'
-								top='80px'
-								right='80px'
-							>
-								X
-							</Button>
+							<Box position='absolute' top='20px' right='20px'>
+								<Button
+									onClick={handlePlayerModalClose}
+									sx={{ fontSize: '24px', fontWeight: 'bold', color: 'black' }}
+								>
+									X
+								</Button>
+							</Box>
 						</Box>
-						<Box p={4} sx={{ border: '2px solid blue' }}>
+						<Box p={4} sx={{ border: '1px solid grey', borderRadius: '12px' }}>
 							<TableContainer>
 								<Table>
 									<TableHead>
-										<Typography variant='h6'>2024 Stats</Typography>
-										<Typography>Hitting</Typography>
+										<Typography variant='h6' sx={{ textWrap: 'nowrap' }}>
+											2024 Stats
+										</Typography>
+										<Typography sx={{ fontWeight: 'bold' }}>Hitting</Typography>
 										<TableRow>
-											<TableCell>GP</TableCell>
-											<TableCell>PA</TableCell>
-											<TableCell>AB</TableCell>
-											<TableCell>R</TableCell>
-											<TableCell>H</TableCell>
-											<TableCell>2B</TableCell>
-											<TableCell>3B</TableCell>
-											<TableCell>HR</TableCell>
-											<TableCell>RBI</TableCell>
-											<TableCell>BB</TableCell>
-											<TableCell>SO</TableCell>
-											<TableCell>AVG</TableCell>
-											<TableCell>OBP</TableCell>
-											<TableCell>SLG</TableCell>
-											<TableCell>OPS</TableCell>
-											<TableCell>HBP</TableCell>
-											<TableCell>SF</TableCell>
-											<TableCell>TB</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>GP</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>PA</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>AB</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>R</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>H</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>2B</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>3B</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>HR</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>RBI</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>BB</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>SO</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>AVG</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>OBP</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>SLG</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>OPS</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>HBP</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>SF</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>TB</TableCell>
 										</TableRow>
 									</TableHead>
 									<TableBody>
 										<TableRow>
 											<TableCell>{playerData?.stats.gamesPlayed}</TableCell>
-											<TableCell>{calculatePlateAppearances()}</TableCell>
+											<TableCell>
+												{calculatePlateAppearances(playerData)}
+											</TableCell>
 											<TableCell>{playerData?.stats.Hitting.AB}</TableCell>
 											<TableCell>{playerData?.stats.Hitting.R}</TableCell>
 											<TableCell>{playerData?.stats.Hitting.H}</TableCell>
@@ -196,9 +160,9 @@ const RosterPage = () => {
 											<TableCell>{playerData?.stats.Hitting.BB}</TableCell>
 											<TableCell>{playerData?.stats.Hitting.SO}</TableCell>
 											<TableCell>{playerData?.stats.Hitting.avg}</TableCell>
-											<TableCell>{calculateOBP()}</TableCell>
-											<TableCell>{calculateSlugging()}</TableCell>
-											<TableCell>{calculateOPS()}</TableCell>
+											<TableCell>{calculateOBP(playerData)}</TableCell>
+											<TableCell>{calculateSlugging(playerData)}</TableCell>
+											<TableCell>{calculateOPS(playerData)}</TableCell>
 											<TableCell>{playerData?.stats.Hitting.HBP}</TableCell>
 											<TableCell>{playerData?.stats.Hitting.SF}</TableCell>
 											<TableCell>{playerData?.stats.Hitting.TB}</TableCell>
