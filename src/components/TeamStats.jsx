@@ -33,7 +33,7 @@ const TeamStats = () => {
 		}
 	}
 
-	const apiUrl = import.meta.env.VITE_API_URL
+	const apiUrl = import.meta.env.VITE_API_URL_TEAMS
 
 	return (
 		<div className='container mx-auto my-8'>
