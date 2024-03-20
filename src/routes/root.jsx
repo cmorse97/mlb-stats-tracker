@@ -1,18 +1,25 @@
 import Teams from '../components/Teams'
+import Navbar from '../components/Navbar'
+import { Box, Container, Typography } from '@mui/material'
 
 const Root = () => {
 	return (
-		<div className='h-screen bg-neutral-200'>
-			<div className='flex items-center justify-center h-40 bg-blue-800'>
-				<h1 className='text-6xl font-bold text-center text-white drop-shadow-xl'>
-					MLB Stats Tracker
-				</h1>
-			</div>
-			<div className='flex flex-col items-center justify-center gap-12 mt-4 md:mt-16'>
-				<h2>Teams:</h2>
-				<Teams />
-			</div>
-		</div>
+		<>
+			<Navbar />
+			<Container maxWidth='lg'>
+				<Box
+					display='flex'
+					flexDirection='column'
+					alignItems='center'
+					justifyContent='center'
+					gap={12}
+					marginTop={4}
+				>
+					<Typography variant='h5'>Pick a team to view roster.</Typography>
+					<Teams />
+				</Box>
+			</Container>
+		</>
 	)
 }
 

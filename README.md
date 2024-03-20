@@ -4,7 +4,9 @@
 
 When you click a player name, load their player data - COMPLETED
 Make a nav menu so that user can go back to home page from roster page - COMPLETED
-On roster page, add Team Logo and Name and current Team Stats - PENDING
+On roster page, add Team Logo and Name and current Team Stats - COMPLETED
+
+Put player modal in own file called PlayerModal.jsx and display certain stat depending on if a player is a pitcher or position player
 
 ## Wishlist Tasks
 

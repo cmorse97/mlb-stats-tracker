@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Root from './routes/root.jsx'
 import ErrorPage from './routes/ErrorPage.jsx'
 import RosterPage from './routes/RosterPage.jsx'
-import PlayerProfile from './routes/PlayerProfile.jsx'
 import './index.css'
 
 const router = createBrowserRouter([
@@ -16,13 +15,7 @@ const router = createBrowserRouter([
 	{
 		path: '/team/:teamAbv',
 		element: <RosterPage />,
-		errorElement: <ErrorPage />,
-		children: [
-			{
-				path: ':playerID',
-				element: <PlayerProfile />
-			}
-		]
+		errorElement: <ErrorPage />
 	}
 ])
 

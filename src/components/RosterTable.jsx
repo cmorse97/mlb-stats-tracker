@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, CircularProgress, Box, Typography } from '@mui/material'
+import {
+	Button,
+	CircularProgress,
+	Box,
+	Typography,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Paper
+} from '@mui/material'
 import axios from 'axios'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper'
 
-export default function RosterTable({ setPlayerData, handlePlayerModalOpen }) {
+const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 	const [rosterData, setRosterData] = useState([])
 	const { teamAbv } = useParams()
 
@@ -46,9 +51,14 @@ export default function RosterTable({ setPlayerData, handlePlayerModalOpen }) {
 	}, [])
 
 	return (
-		<div className='container mx-auto my-8'>
+		<>
 			{!rosterData.length ? (
-				<Box display='flex' alignItems='center' justifyContent='center'>
+				<Box
+					display='flex'
+					alignItems='center'
+					justifyContent='center'
+					marginY={8}
+				>
 					<CircularProgress />
 				</Box>
 			) : (
@@ -93,6 +103,8 @@ export default function RosterTable({ setPlayerData, handlePlayerModalOpen }) {
 					</Table>
 				</TableContainer>
 			)}
-		</div>
+		</>
 	)
 }
+
+export default RosterTable

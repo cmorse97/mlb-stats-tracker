@@ -3,9 +3,10 @@ import {
 	Box,
 	Typography,
 	Toolbar,
-	IconButton,
-	Button
+	Container,
+	Icon
 } from '@mui/material'
+import { SportsBaseball } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
 
 const Navbar = () => {
@@ -13,9 +14,16 @@ const Navbar = () => {
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar position='static'>
 				<Toolbar>
-					<Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
-						<Link to='/'>MLB Stats Tracker</Link>
-					</Typography>
+					<Container maxWidth='lg'>
+						<Typography
+							variant='h6'
+							py={4}
+							component='div'
+							sx={{ flexGrow: 1 }}
+						>
+							<Link to='/'>MLB Stats Tracker</Link>
+						</Typography>
+					</Container>
 				</Toolbar>
 			</AppBar>
 		</Box>
