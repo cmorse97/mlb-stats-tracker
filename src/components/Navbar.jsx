@@ -6,7 +6,6 @@ import {
 	Container,
 	Icon
 } from '@mui/material'
-import { SportsBaseball } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
 
 const Navbar = () => {

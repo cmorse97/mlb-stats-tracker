@@ -14,15 +14,12 @@ const TopPerformers = () => {
 					topPerformers: 'true'
 				},
 				headers: {
-					'X-RapidAPI-Key':
-						'e700ebd9b9msh3c341d7598dfff4p170c1bjsnce6a07dfd2eb',
-					'X-RapidAPI-Host':
-						'tank01-mlb-live-in-game-real-time-statistics.p.rapidapi.com'
+					'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
+					'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
 				}
 			}
 
-			const apiUrl =
-				'https://tank01-mlb-live-in-game-real-time-statistics.p.rapidapi.com/getMLBTeams'
+			const apiUrl = import.meta.env.VITE_API_URL
 
 			axios
 				.get(apiUrl, options)
