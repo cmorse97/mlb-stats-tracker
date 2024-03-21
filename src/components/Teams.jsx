@@ -4,7 +4,7 @@ import { CircularProgress } from '@mui/material'
 import axios from 'axios'
 
 const Teams = () => {
-	const [teamsData, setTeamsData] = useState([])
+	const [teamsData, setTeamsData] = useState({})
 
 	useEffect(() => {
 		const fetchTeamsData = async () => {
@@ -36,7 +36,7 @@ const Teams = () => {
 	return (
 		<>
 			<div className='container flex flex-wrap items-center justify-center gap-12'>
-				{!teamsData.length ? (
+				{!Object.keys(teamsData).length ? (
 					<CircularProgress />
 				) : (
 					teamsData.map(team => (
