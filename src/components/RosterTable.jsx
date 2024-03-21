@@ -19,6 +19,8 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 	const [rosterData, setRosterData] = useState([])
 	const { teamAbv } = useParams()
 
+	// Add sorting functionality to roster table
+
 	useEffect(() => {
 		const fetchRosterData = async () => {
 			const options = {
