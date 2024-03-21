@@ -4,7 +4,7 @@ import { CircularProgress, Container, Box, Typography } from '@mui/material'
 import axios from 'axios'
 
 const Teams = () => {
-	const [teamsData, setTeamsData] = useState({})
+	const [teamsData, setTeamsData] = useState([])
 
 	useEffect(() => {
 		const fetchTeamsData = async () => {
@@ -42,27 +42,29 @@ const Teams = () => {
 				justifyContent='space-evenly'
 				gap={10}
 			>
-				{!Object.keys(teamsData).length ? (
+				{!teamsData.length ? (
 					<CircularProgress />
 				) : (
-					teamsData.map(team => (
-						<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
-							<Box
-								display='flex'
-								flexDirection='column'
-								alignItems='center'
-								justifyContent='center'
-								gap={2}
-							>
-								<img
-									src={team.mlbLogo1}
-									alt={`${team.teamCity} ${team.teamName}`}
-									className='w-8 h-8 md:h-12 md:w-12'
-								/>
-								<Typography>{team.teamName}</Typography>
-							</Box>
-						</Link>
-					))
+					teamsData
+						.filter(team => team)
+						.map(team => (
+							<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
+								<Box
+									display='flex'
+									flexDirection='column'
+									alignItems='center'
+									justifyContent='center'
+									gap={2}
+								>
+									<img
+										src={team.mlbLogo1}
+										alt={`${team.teamCity} ${team.teamName}`}
+										className='w-8 h-8 md:h-12 md:w-12'
+									/>
+									<Typography>{team.teamName}</Typography>
+								</Box>
+							</Link>
+						))
 				)}
 			</Box>
 		</Container>
