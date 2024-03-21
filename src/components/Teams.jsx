@@ -45,26 +45,24 @@ const Teams = () => {
 				{!teamsData.length ? (
 					<CircularProgress />
 				) : (
-					teamsData
-						.filter(team => team)
-						.map(team => (
-							<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
-								<Box
-									display='flex'
-									flexDirection='column'
-									alignItems='center'
-									justifyContent='center'
-									gap={2}
-								>
-									<img
-										src={team.mlbLogo1}
-										alt={`${team.teamCity} ${team.teamName}`}
-										className='w-8 h-8 md:h-12 md:w-12'
-									/>
-									<Typography>{team.teamName}</Typography>
-								</Box>
-							</Link>
-						))
+					teamsData.map(team => (
+						<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
+							<Box
+								display='flex'
+								flexDirection='column'
+								alignItems='center'
+								justifyContent='center'
+								gap={2}
+							>
+								<img
+									src={team.mlbLogo1}
+									alt={`${team.teamCity} ${team.teamName}`}
+									className='w-8 h-8 md:h-12 md:w-12'
+								/>
+								<Typography>{team.teamName}</Typography>
+							</Box>
+						</Link>
+					))
 				)}
 			</Box>
 		</Container>
