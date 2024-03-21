@@ -45,6 +45,8 @@ const Teams = () => {
 				{!Object.keys(teamsData).length ? (
 					<CircularProgress />
 				) : (
+					// Believe the error is happening with the .map
+
 					teamsData.map(team => (
 						<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
 							<Box
