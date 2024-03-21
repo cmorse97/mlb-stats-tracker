@@ -5,6 +5,7 @@ import { Box, Container, Typography } from '@mui/material'
 const Root = () => {
 	return (
 		<>
+			{/* Implement responsive layout */}
 			<Navbar />
 			<Container maxWidth='lg'>
 				<Box
