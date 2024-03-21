@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
-import { Box, CircularProgress } from '@mui/material'
+import { Box, CircularProgress, Container, Typography } from '@mui/material'
 
 const TeamStats = () => {
 	const [teamData, setTeamData] = useState({})
@@ -9,6 +9,19 @@ const TeamStats = () => {
 
 	useEffect(() => {
 		const fetchTeamData = async () => {
+			const options = {
+				params: {
+					teamStats: 'true',
+					topPerformers: 'true'
+				},
+				headers: {
+					'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
+					'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
+				}
+			}
+
+			const apiUrl = import.meta.env.VITE_API_URL_TEAMS
+
 			axios
 				.get(apiUrl, options)
 				.then(response => {
@@ -22,52 +35,50 @@ const TeamStats = () => {
 		fetchTeamData()
 	}, [])
 
-	const options = {
-		params: {
-			teamStats: 'true',
-			topPerformers: 'true'
-		},
-		headers: {
-			'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-			'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
-		}
-	}
-
-	const apiUrl = import.meta.env.VITE_API_URL_TEAMS
-
 	return (
-		<div className='container mx-auto my-8'>
+		<Container maxWidth='lg' sx={{ margin: 'auto' }}>
 			{!Object.keys(teamData).length ? (
 				<Box display='flex' alignItems='center' justifyContent='center'>
 					<CircularProgress />
 				</Box>
 			) : (
-				<div className='flex gap-8 p-2 border border-black'>
+				<Box display='flex' gap={4} p={2}>
 					<img
 						src={teamData.espnLogo1}
 						alt={teamData.teamAbv}
-						width={108}
+						width={124}
 						height={108}
 					/>
 
-					<div className='flex flex-col justify-center gap-2'>
-						<h3>
+					<Box
+						display='flex'
+						flexDirection='column'
+						justifyContent='center'
+						gap={2}
+					>
+						<Typography variant='h5'>
 							{teamData.teamCity} {teamData.teamName}
-						</h3>
-						<p>
+						</Typography>
+						<Typography variant='h6'>
 							{teamData.conferenceAbv} {teamData.division}
-						</p>
-						<p>
+						</Typography>
+						<Typography>
 							({teamData.wins} - {teamData.loss})
-						</p>
-					</div>
+						</Typography>
+					</Box>
 
-					<div className='flex items-center justify-center flex-1 gap-2 border border-red-50'>
+					<Box
+						display='flex'
+						alignItems='center'
+						justifyContent='center'
+						flexGrow={1}
+						gap={2}
+					>
 						No 2024 team stats, season starting soon...
-					</div>
-				</div>
+					</Box>
+				</Box>
 			)}
-		</div>
+		</Container>
 	)
 }
 

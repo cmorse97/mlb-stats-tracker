@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, Container, Box, Typography } from '@mui/material'
 import axios from 'axios'
 
 const Teams = () => {
@@ -8,6 +8,19 @@ const Teams = () => {
 
 	useEffect(() => {
 		const fetchTeamsData = async () => {
+			const options = {
+				params: {
+					teamStats: 'true',
+					topPerformers: 'true'
+				},
+				headers: {
+					'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
+					'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
+				}
+			}
+
+			const apiUrl = import.meta.env.VITE_API_URL_TEAMS
+
 			axios
 				.get(apiUrl, options)
 				.then(response => {
@@ -20,40 +33,39 @@ const Teams = () => {
 		fetchTeamsData()
 	}, [])
 
-	const options = {
-		params: {
-			teamStats: 'true',
-			topPerformers: 'true'
-		},
-		headers: {
-			'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-			'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
-		}
-	}
-
-	const apiUrl = import.meta.env.VITE_API_URL_TEAMS
-
 	return (
-		<>
-			<div className='container flex flex-wrap items-center justify-center gap-12'>
+		<Container maxWidth='lg'>
+			<Box
+				display='flex'
+				flexWrap='wrap'
+				alignItems='center'
+				justifyContent='space-evenly'
+				gap={10}
+			>
 				{!Object.keys(teamsData).length ? (
 					<CircularProgress />
 				) : (
 					teamsData.map(team => (
 						<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
-							<div className='flex flex-col items-center justify-center gap-2 text-sm'>
+							<Box
+								display='flex'
+								flexDirection='column'
+								alignItems='center'
+								justifyContent='center'
+								gap={2}
+							>
 								<img
 									src={team.mlbLogo1}
 									alt={`${team.teamCity} ${team.teamName}`}
 									className='w-8 h-8 md:h-12 md:w-12'
 								/>
-								<p>{team.teamName}</p>
-							</div>
+								<Typography>{team.teamName}</Typography>
+							</Box>
 						</Link>
 					))
 				)}
-			</div>
-		</>
+			</Box>
+		</Container>
 	)
 }
 
