@@ -11,13 +11,28 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
+	TableSortLabel,
 	Paper
 } from '@mui/material'
 import axios from 'axios'
+import { sortRosterTable } from '../utils/sortRosterTable'
 
 const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 	const [rosterData, setRosterData] = useState([])
+	const [sortBy, setSortBy] = useState('pos')
+	const [sortDirection, setSortDirection] = useState('asc')
 	const { teamAbv } = useParams()
+
+	const handleSort = column => {
+		if (sortBy === column) {
+			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+		} else {
+			setSortBy(column)
+			setSortDirection('asc')
+		}
+	}
+
+	const sortedData = sortRosterTable(rosterData, sortBy, sortDirection) // Use sortData function
 
 	useEffect(() => {
 		const fetchRosterData = async () => {
@@ -64,13 +79,37 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 					<Table sx={{ minWidth: 650 }} aria-label='simple table'>
 						<TableHead>
 							<TableRow>
-								<TableCell>Position</TableCell>
-								<TableCell>Name</TableCell>
-								<TableCell>Number</TableCell>
+								<TableCell>
+									<TableSortLabel
+										active={sortBy === 'pos'}
+										direction={sortDirection}
+										onClick={() => handleSort('pos')}
+									>
+										Position
+									</TableSortLabel>
+								</TableCell>
+								<TableCell>
+									<TableSortLabel
+										active={sortBy === 'longName'}
+										direction={sortDirection}
+										onClick={() => handleSort('longName')}
+									>
+										Name
+									</TableSortLabel>
+								</TableCell>
+								<TableCell>
+									<TableSortLabel
+										active={sortBy === 'jerseyNum'}
+										direction={sortDirection}
+										onClick={() => handleSort('jerseyNum')}
+									>
+										Number
+									</TableSortLabel>
+								</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{rosterData.map(player => (
+							{sortedData.map(player => (
 								<TableRow
 									key={player.playerID}
 									sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
