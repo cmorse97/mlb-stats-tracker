@@ -15,14 +15,14 @@ const RosterPage = () => {
 	return (
 		<>
 			<Navbar />
-			<Container maxWidth='lg' sx={{ marginY: '2em' }}>
+			<Container maxWidth='lg' sx={{ marginY: '12px' }}>
 				<TeamStats />
 				<TopPerformers />
 				<RosterTable
 					setPlayerData={setPlayerData}
 					handlePlayerModalOpen={handlePlayerModalOpen}
 				/>
-				<Container maxWidth='lg' my={8}>
+				<Container maxWidth='lg'>
 					<Modal open={playerModalOpen} onClose={handlePlayerModalClose}>
 						<PlayerModal
 							setPlayerData={playerData}
