@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { CircularProgress, Container, Box, Typography } from '@mui/material'
+import { CircularProgress, Container, Box, Paper, Grid } from '@mui/material'
 import axios from 'axios'
 
 const Teams = () => {
@@ -35,36 +35,43 @@ const Teams = () => {
 
 	return (
 		<Container maxWidth='lg'>
-			<Box
-				display='flex'
-				flexWrap='wrap'
-				alignItems='center'
-				justifyContent='space-evenly'
-				gap={10}
-			>
+			<Grid container spacing={4} mx='auto'>
 				{!teamsData.length ? (
-					<CircularProgress />
+					<Box mx='auto'>
+						<CircularProgress />
+					</Box>
 				) : (
 					teamsData.map(team => (
-						<Link to={`/team/${team.teamAbv}`} key={team.teamID}>
-							<Box
-								display='flex'
-								flexDirection='column'
-								alignItems='center'
-								justifyContent='center'
-								gap={2}
-							>
-								<img
-									src={team.mlbLogo1}
-									alt={`${team.teamCity} ${team.teamName}`}
-									className='w-8 h-8 md:h-12 md:w-12'
-								/>
-								<Typography>{team.teamName}</Typography>
-							</Box>
-						</Link>
+						<Grid item xs={6} sm={2} key={team.teamID}>
+							<Link to={`/team/${team.teamAbv}`}>
+								<Box
+									p={2}
+									component={Paper}
+									sx={{
+										borderRadius: '50%',
+										display: 'flex',
+										justifyContent: 'center',
+										alignItems: 'center',
+										height: '100px',
+										width: '100px',
+										overflow: 'hidden' // Hide overflow to prevent image stretching
+									}}
+								>
+									<img
+										src={team.mlbLogo1}
+										alt={`${team.teamCity} ${team.teamName}`}
+										style={{
+											maxWidth: '100%',
+											maxHeight: '100%',
+											objectFit: 'cover'
+										}} // Maintain aspect ratio and cover entire box
+									/>
+								</Box>
+							</Link>
+						</Grid>
 					))
 				)}
-			</Box>
+			</Grid>
 		</Container>
 	)
 }

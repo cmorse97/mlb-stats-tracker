@@ -13,10 +13,10 @@ const Root = () => {
 					flexDirection='column'
 					alignItems='center'
 					justifyContent='center'
-					gap={12}
-					marginTop={4}
+					gap={8}
+					my={4}
 				>
-					<Typography variant='h5'>Pick a team to view roster.</Typography>
+					<Typography variant='h5'>Pick a team to view roster</Typography>
 					<Teams />
 				</Box>
 			</Container>
