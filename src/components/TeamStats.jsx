@@ -90,65 +90,27 @@ const TeamStats = () => {
 						</Box>
 					</Grid>
 					<Grid item xs={12} md={8}>
-						<Grid container spacing={2}>
-							<Grid item xs={12} sm={4}>
-								<Box
-									display='flex'
-									flexWrap='wrap'
-									alignItems='center'
-									justifyContent='center'
-									gap={2}
-									py={2}
-									sx={{ border: '2px solid red' }}
-								>
-									<Typography>Pitching</Typography>
-									<Typography>Runs Allowed</Typography>
-									<Typography>Team ERA</Typography>
-									<Typography>Team WHIP</Typography>
-									<Typography>Hits</Typography>
-									<Typography>HR</Typography>
-									<Typography>Saves</Typography>
-									<Typography>Blown Saves</Typography>
-								</Box>
-							</Grid>
-							<Grid item xs={12} sm={4}>
-								<Box
-									display='flex'
-									flexWrap='wrap'
-									alignItems='center'
-									justifyContent='center'
-									gap={2}
-									py={2}
-									sx={{ border: '2px solid red' }}
-								>
-									<Typography>Hitting</Typography>
-									<Typography>Runs Scored</Typography>
-									<Typography>Team AVG</Typography>
-									<Typography>Hits</Typography>
-									<Typography>HR</Typography>
-									<Typography>SO</Typography>
-									<Typography>Team SLG</Typography>
-									<Typography>Team OBP</Typography>
-									<Typography>Team OPS</Typography>
-								</Box>
-							</Grid>
-							<Grid item xs={12} sm={4}>
-								<Box
-									display='flex'
-									flexWrap='wrap'
-									alignItems='center'
-									justifyContent='center'
-									gap={2}
-									py={2}
-									sx={{ border: '2px solid red' }}
-								>
-									<Typography>Fielding and Baserunning</Typography>
-									<Typography>Errors</Typography>
-									<Typography>Stolen bases</Typography>
-									<Typography>Caught stealing</Typography>
-								</Box>
-							</Grid>
-						</Grid>
+						<Typography textAlign='center' variant='h6'>
+							Team Stats
+						</Typography>
+						<Box display='flex' flexWrap='wrap'>
+							<Typography>R: 0</Typography>
+							<Typography>RA: 0</Typography>
+							<Typography>ERA: 0.00</Typography>
+							<Typography>WHIP: 0.00</Typography>
+							<Typography>AVG: .000</Typography>
+							<Typography>SLG: .000</Typography>
+							<Typography>OBP: .000</Typography>
+							<Typography>OPS: 0.000</Typography>
+							<Typography>Hits: 0</Typography>
+							<Typography>HR: 0</Typography>
+							<Typography>Saves: 0</Typography>
+							<Typography>BS: 0</Typography>
+							<Typography>SO: 0</Typography>
+							<Typography>E: 0</Typography>
+							<Typography>SB: 0</Typography>
+							<Typography>CS: 0</Typography>
+						</Box>
 					</Grid>
 				</Grid>
 			)}
