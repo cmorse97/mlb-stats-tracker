@@ -9,7 +9,8 @@ import {
 	Divider,
 	Typography,
 	Card,
-	CardContent
+	CardContent,
+	CardHeader
 } from '@mui/material'
 
 const playerAttribute = {
@@ -91,18 +92,21 @@ const TopPerformers = () => {
 	}
 
 	return (
-		<Box marginX='auto' marginY={8}>
+		<Box mx='auto' marginY={8}>
 			{!Object.keys(topPerformersData).length ? (
 				<p>Season has not started yet, coming soon...</p>
 			) : (
-				<Box sx={{ border: 'black solid 2px' }}>
-					<Box sx={{ border: 'red solid 2px' }} margin={2}>
-						<Typography variant='h6'>Top Pitching Performers</Typography>
-						<Grid container spacing={2}>
-							<Card>
-								<CardContent>
-									<Typography variant='subtitle1'>Strikeouts</Typography>
-									<Grid item xs={2}>
+				<Grid container spacing={8}>
+					<Grid item xs={12} md={6}>
+						<Typography variant='h6' textAlign='center' marginBottom={2}>
+							Top Pitching Performers
+						</Typography>
+						<Divider />
+						<Grid container spacing={2} marginTop={2}>
+							<Grid item xs={4}>
+								<Card raised sx={{ borderRadius: '5%' }}>
+									<CardContent>
+										<Typography textAlign='center'>Stikeouts</Typography>
 										<Avatar
 											src={getPlayerAttribute(
 												topPerformersData.Pitching.SO.playerID[0],
@@ -112,128 +116,201 @@ const TopPerformers = () => {
 												topPerformersData.Pitching.SO.playerID[0],
 												playerAttribute.longName
 											)}
+											sx={{
+												width: '56px',
+												height: '56px',
+												mx: 'auto',
+												my: '8px'
+											}}
 										/>
-										<Typography>
+										<Typography textAlign='center'>
 											{getPlayerAttribute(
 												topPerformersData.Pitching.SO.playerID[0],
 												playerAttribute.longName
 											)}
 										</Typography>
-										<Typography>
+										<Typography textAlign='center' fontWeight='bold'>
 											{topPerformersData.Pitching.SO.total}
 										</Typography>
-									</Grid>
-								</CardContent>
-							</Card>
-							<Typography variant='subtitle1'>Wins</Typography>
-							<Grid>
-								<Avatar
-									src={getPlayerAttribute(
-										topPerformersData.Pitching.Win.playerID[0],
-										playerAttribute.mlbHeadshot
-									)}
-									alt={getPlayerAttribute(
-										topPerformersData.Pitching.Win.playerID[0],
-										playerAttribute.longName
-									)}
-								/>
-								<Typography>
-									{getPlayerAttribute(
-										topPerformersData.Pitching.Win.playerID[0],
-										playerAttribute.longName
-									)}
-								</Typography>
-								<Typography>{topPerformersData.Pitching.Win.total}</Typography>
+									</CardContent>
+								</Card>
 							</Grid>
-							<Typography variant='subtitle1'>Saves</Typography>
-							<Grid>
-								<Avatar
-									src={getPlayerAttribute(
-										topPerformersData.Pitching.Save.playerID[0],
-										playerAttribute.mlbHeadshot
-									)}
-									alt={getPlayerAttribute(
-										topPerformersData.Pitching.Save.playerID[0],
-										playerAttribute.longName
-									)}
-								/>
-								<Typography>
-									{getPlayerAttribute(
-										topPerformersData.Pitching.Save.playerID[0],
-										playerAttribute.longName
-									)}
-								</Typography>
-								<Typography>{topPerformersData.Pitching.Save.total}</Typography>
-							</Grid>
-						</Grid>
-					</Box>
 
-					<Box sx={{ border: 'blue solid 2px' }} margin={2}>
-						<Typography variant='h6'>Top Hitting Performers</Typography>
-						<Grid>
-							<Typography variant='subtitle1'>Batting Average</Typography>
-							<Grid>
-								<Avatar
-									src={getPlayerAttribute(
-										topPerformersData.Hitting.avg.playerID[0],
-										playerAttribute.mlbHeadshot
-									)}
-									alt={getPlayerAttribute(
-										topPerformersData.Hitting.avg.playerID[0],
-										playerAttribute.longName
-									)}
-								/>
-								<Typography>
-									{getPlayerAttribute(
-										topPerformersData.Hitting.avg.playerID[0],
-										playerAttribute.longName
-									)}
-								</Typography>
-								<Typography>{topPerformersData.Hitting.avg.total}</Typography>
+							<Grid item xs={4}>
+								<Card raised sx={{ borderRadius: '5%' }}>
+									<CardContent>
+										<Typography textAlign='center'>Wins</Typography>
+										<Avatar
+											src={getPlayerAttribute(
+												topPerformersData.Pitching.Win.playerID[0],
+												playerAttribute.mlbHeadshot
+											)}
+											alt={getPlayerAttribute(
+												topPerformersData.Pitching.Win.playerID[0],
+												playerAttribute.longName
+											)}
+											sx={{
+												width: '56px',
+												height: '56px',
+												mx: 'auto',
+												my: '8px'
+											}}
+										/>
+										<Typography textAlign='center'>
+											{getPlayerAttribute(
+												topPerformersData.Pitching.Win.playerID[0],
+												playerAttribute.longName
+											)}
+										</Typography>
+										<Typography textAlign='center' fontWeight='bold'>
+											{topPerformersData.Pitching.Win.total}
+										</Typography>
+									</CardContent>
+								</Card>
 							</Grid>
-							<Typography variant='subtitle1'>Homeruns</Typography>
-							<Grid>
-								<Avatar
-									src={getPlayerAttribute(
-										topPerformersData.Hitting.HR.playerID[0],
-										playerAttribute.mlbHeadshot
-									)}
-									alt={getPlayerAttribute(
-										topPerformersData.Hitting.HR.playerID[0],
-										playerAttribute.longName
-									)}
-								/>
-								<Typography>
-									{getPlayerAttribute(
-										topPerformersData.Hitting.HR.playerID[0],
-										playerAttribute.longName
-									)}
-								</Typography>
-								<Typography>{topPerformersData.Hitting.HR.total}</Typography>
-							</Grid>
-							<Typography variant='subtitle1'>Hits</Typography>
-							<Grid>
-								<Avatar
-									src={getPlayerAttribute(
-										topPerformersData.Hitting.H.playerID[0],
-										playerAttribute.mlbHeadshot
-									)}
-									alt={getPlayerAttribute(
-										topPerformersData.Hitting.H.playerID[0],
-										playerAttribute.longName
-									)}
-								/>
-								<Typography>
-									{getPlayerAttribute(
-										topPerformersData.Hitting.H.playerID[0],
-										playerAttribute.longName
-									)}
-								</Typography>
-								<Typography>{topPerformersData.Hitting.H.total}</Typography>
+
+							<Grid item xs={4}>
+								<Card raised sx={{ borderRadius: '5%' }}>
+									<CardContent>
+										<Typography textAlign='center'>Saves</Typography>
+										<Avatar
+											src={getPlayerAttribute(
+												topPerformersData.Pitching.Save.playerID[0],
+												playerAttribute.mlbHeadshot
+											)}
+											alt={getPlayerAttribute(
+												topPerformersData.Pitching.Save.playerID[0],
+												playerAttribute.longName
+											)}
+											sx={{
+												width: '56px',
+												height: '56px',
+												mx: 'auto',
+												my: '8px'
+											}}
+										/>
+										<Typography textAlign='center'>
+											{getPlayerAttribute(
+												topPerformersData.Pitching.Save.playerID[0],
+												playerAttribute.longName
+											)}
+										</Typography>
+										<Typography textAlign='center' fontWeight='bold'>
+											{topPerformersData.Pitching.Save.total}
+										</Typography>
+									</CardContent>
+								</Card>
 							</Grid>
 						</Grid>
-					</Box>
-				</Box>
+					</Grid>
+
+					<Grid item xs={12} md={6}>
+						<Typography variant='h6' textAlign='center' marginBottom={2}>
+							Top Hitting Performers
+						</Typography>
+						<Divider />
+						<Grid container spacing={2} marginTop={2}>
+							<Grid item xs={4}>
+								<Card raised sx={{ borderRadius: '5%' }}>
+									<CardContent>
+										<Typography textAlign='center'>Batting Average</Typography>
+										<Avatar
+											src={getPlayerAttribute(
+												topPerformersData.Hitting.avg.playerID[0],
+												playerAttribute.mlbHeadshot
+											)}
+											alt={getPlayerAttribute(
+												topPerformersData.Hitting.avg.playerID[0],
+												playerAttribute.longName
+											)}
+											sx={{
+												width: '56px',
+												height: '56px',
+												mx: 'auto',
+												my: '8px'
+											}}
+										/>
+										<Typography textAlign='center'>
+											{getPlayerAttribute(
+												topPerformersData.Hitting.avg.playerID[0],
+												playerAttribute.longName
+											)}
+										</Typography>
+										<Typography textAlign='center' fontWeight='bold'>
+											{topPerformersData.Hitting.avg.total}
+										</Typography>
+									</CardContent>
+								</Card>
+							</Grid>
+
+							<Grid item xs={4}>
+								<Card raised sx={{ borderRadius: '5%' }}>
+									<CardContent>
+										<Typography textAlign='center'>Homeruns</Typography>
+										<Avatar
+											src={getPlayerAttribute(
+												topPerformersData.Hitting.HR.playerID[0],
+												playerAttribute.mlbHeadshot
+											)}
+											alt={getPlayerAttribute(
+												topPerformersData.Hitting.HR.playerID[0],
+												playerAttribute.longName
+											)}
+											sx={{
+												width: '56px',
+												height: '56px',
+												mx: 'auto',
+												my: '8px'
+											}}
+										/>
+										<Typography textAlign='center'>
+											{getPlayerAttribute(
+												topPerformersData.Hitting.HR.playerID[0],
+												playerAttribute.longName
+											)}
+										</Typography>
+										<Typography textAlign='center' fontWeight='bold'>
+											{topPerformersData.Hitting.HR.total}
+										</Typography>
+									</CardContent>
+								</Card>
+							</Grid>
+
+							<Grid item xs={4}>
+								<Card raised sx={{ borderRadius: '5%' }}>
+									<CardContent>
+										<Typography textAlign='center'>Hits</Typography>
+										<Avatar
+											src={getPlayerAttribute(
+												topPerformersData.Hitting.H.playerID[0],
+												playerAttribute.mlbHeadshot
+											)}
+											alt={getPlayerAttribute(
+												topPerformersData.Hitting.H.playerID[0],
+												playerAttribute.longName
+											)}
+											sx={{
+												width: '56px',
+												height: '56px',
+												mx: 'auto',
+												my: '8px'
+											}}
+										/>
+										<Typography textAlign='center'>
+											{getPlayerAttribute(
+												topPerformersData.Hitting.H.playerID[0],
+												playerAttribute.longName
+											)}
+										</Typography>
+										<Typography textAlign='center' fontWeight='bold'>
+											{topPerformersData.Hitting.H.total}
+										</Typography>
+									</CardContent>
+								</Card>
+							</Grid>
+						</Grid>
+					</Grid>
+				</Grid>
 			)}
 		</Box>
 	)
