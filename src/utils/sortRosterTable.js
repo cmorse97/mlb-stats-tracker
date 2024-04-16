@@ -7,7 +7,8 @@ const positionIndex = {
 	LF: 6,
 	CF: 7,
 	RF: 8,
-	P: 9
+	DH: 9,
+	P: 10
 }
 
 export const sortRosterTable = (data, sortBy, sortDirection) => {

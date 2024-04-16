@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import {
+	Avatar,
 	Button,
 	CircularProgress,
 	Box,
@@ -75,11 +76,11 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 					<CircularProgress />
 				</Box>
 			) : (
-				<TableContainer component={Paper}>
-					<Table sx={{ minWidth: 'sm' }} aria-label='simple table'>
+				<TableContainer component={Paper} elevation={24}>
+					<Table sx={{ minWidth: 'sm' }}>
 						<TableHead>
 							<TableRow>
-								<TableCell>
+								<TableCell align='center'>
 									<TableSortLabel
 										active={sortBy === 'pos'}
 										direction={sortDirection}
@@ -88,7 +89,7 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 										Position
 									</TableSortLabel>
 								</TableCell>
-								<TableCell>
+								<TableCell align='center'>
 									<TableSortLabel
 										active={sortBy === 'longName'}
 										direction={sortDirection}
@@ -97,7 +98,7 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 										Name
 									</TableSortLabel>
 								</TableCell>
-								<TableCell>
+								<TableCell align='center'>
 									<TableSortLabel
 										active={sortBy === 'jerseyNum'}
 										direction={sortDirection}
@@ -114,26 +115,39 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 									key={player.playerID}
 									sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 								>
-									<TableCell>{player.pos}</TableCell>
+									<TableCell align='center'>{player.pos}</TableCell>
 									<TableCell align='left'>
-										<Button
-											onClick={() => {
-												setPlayerData(player)
-												handlePlayerModalOpen()
+										<Box
+											sx={{
+												width: '60%',
+												marginX: 'auto'
 											}}
-											disabled={Object.keys(player).length === 0}
 										>
-											<img
-												src={player.mlbHeadshot}
-												alt={player.longName}
-												width={36}
-												height={36}
-												className='mr-2'
-											/>
-											<Typography color='black'>{player.longName}</Typography>
-										</Button>
+											<Button
+												onClick={() => {
+													setPlayerData(player)
+													handlePlayerModalOpen()
+												}}
+												disabled={Object.keys(player).length === 0}
+												sx={{
+													width: '60%',
+													display: 'flex',
+													justifyContent: 'start',
+													marginX: 'auto'
+												}}
+											>
+												<Avatar
+													src={player.mlbHeadshot}
+													alt={player.longName}
+													sx={{ marginRight: '4px' }}
+												/>
+												<Typography color='black' textAlign='left'>
+													{player.longName}
+												</Typography>
+											</Button>
+										</Box>
 									</TableCell>
-									<TableCell>{player.jerseyNum}</TableCell>
+									<TableCell align='center'>{player.jerseyNum}</TableCell>
 								</TableRow>
 							))}
 						</TableBody>

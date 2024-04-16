@@ -33,6 +33,7 @@ const TeamStats = () => {
 				.then(response => {
 					const teams = response.data.body
 					const team = teams.find(team => team.teamAbv === teamAbv)
+					console.log(team)
 					setTeamData(team)
 				})
 				.catch(err => console.log(err))
@@ -54,7 +55,6 @@ const TeamStats = () => {
 							display='flex'
 							justifyContent='center'
 							height='100%' // Ensure the Box takes full height of the Grid item
-							sx={{ border: '2px solid blue' }}
 						>
 							<img
 								src={teamData.espnLogo1}
@@ -73,15 +73,14 @@ const TeamStats = () => {
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								border: '2px solid black',
 								alignItems: { xs: 'center', md: 'flex-start' }, // Center on xs screens, align flex-start on md screens
 								justifyContent: { xs: 'center', md: 'flex-start' } // Center on xs screens, align flex-start on md screens
 							}}
 						>
-							<Typography variant='subtitle1'>
+							<Typography variant='h5'>
 								{teamData.teamCity} {teamData.teamName}
 							</Typography>
-							<Typography variant='subtitle2'>
+							<Typography variant='h6'>
 								{teamData.conferenceAbv} {teamData.division}
 							</Typography>
 							<Typography variant='body1'>
@@ -93,23 +92,13 @@ const TeamStats = () => {
 						<Typography textAlign='center' variant='h6'>
 							Team Stats
 						</Typography>
-						<Box display='flex' flexWrap='wrap'>
-							<Typography>R: 0</Typography>
-							<Typography>RA: 0</Typography>
-							<Typography>ERA: 0.00</Typography>
-							<Typography>WHIP: 0.00</Typography>
-							<Typography>AVG: .000</Typography>
-							<Typography>SLG: .000</Typography>
-							<Typography>OBP: .000</Typography>
-							<Typography>OPS: 0.000</Typography>
-							<Typography>Hits: 0</Typography>
-							<Typography>HR: 0</Typography>
-							<Typography>Saves: 0</Typography>
-							<Typography>BS: 0</Typography>
-							<Typography>SO: 0</Typography>
-							<Typography>E: 0</Typography>
-							<Typography>SB: 0</Typography>
-							<Typography>CS: 0</Typography>
+						<Box textAlign='center'>
+							<Typography>
+								Runs Scored: <strong>{teamData.RS}</strong>
+							</Typography>
+							<Typography>
+								Runs Allowed: <strong>{teamData.RA}</strong>
+							</Typography>
 						</Box>
 					</Grid>
 				</Grid>

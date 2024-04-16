@@ -4,13 +4,12 @@ import axios from 'axios'
 import {
 	Box,
 	Grid,
-	Paper,
 	Avatar,
 	Divider,
 	Typography,
 	Card,
 	CardContent,
-	CardHeader
+	CircularProgress
 } from '@mui/material'
 
 const playerAttribute = {
@@ -78,7 +77,6 @@ const TopPerformers = () => {
 						const teams = response.data.body
 						const team = teams.find(team => team.teamAbv === teamAbv)
 						setTopPerformersData(team.topPerformers)
-						console.log(topPerformersData)
 					})
 					.catch(err => console.log(err))
 			})() // Invoking function immediately after creation, no need for const variable storage
@@ -94,7 +92,9 @@ const TopPerformers = () => {
 	return (
 		<Box mx='auto' marginY={8}>
 			{!Object.keys(topPerformersData).length ? (
-				<p>Season has not started yet, coming soon...</p>
+				<Box display='flex' justifyContent='center' alignItems='center'>
+					<CircularProgress />
+				</Box>
 			) : (
 				<Grid container spacing={8}>
 					<Grid item xs={12} md={6}>
