@@ -2,17 +2,12 @@
 
 ## Priority Tasks
 
-When you click a player name, load their player data - COMPLETED
-Make a nav menu so that user can go back to home page from roster page - COMPLETED
-On roster page, add Team Logo and Name and current Team Stats - COMPLETED
-Put player modal in own file called PlayerModal.jsx and display certain stat depending on if a player is a pitcher or position player - COMPLETED
-Add sorting functionality to RosterTable so that user can sort by position, player name, or jersey number. Default sort to position ascending - COMPLETED
+Review Codebase
+
+Add about page to credit api
+Add news page with top stories feed
 
 ## Wishlist Tasks
-
-Make modal pretty and display player details and stats - COMPLETED
-
-Make app mobile friendly styling - pending
 
 Graph player projections
 Graph player recent performance
