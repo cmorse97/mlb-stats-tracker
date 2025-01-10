@@ -105,23 +105,27 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 									Pitching Stats
 								</Typography>
 								<TableRow>
-									<TableCell sx={{ fontWeight: 'bold' }}>GP</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>GS</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>W</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>L</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>ERA</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>WHIP</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>IP</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>H</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>HR</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>BB</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>SO</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>R</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>ER</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>SV</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>BS</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>HOLD</TableCell>
-									<TableCell sx={{ fontWeight: 'bold' }}>WP</TableCell>
+									{[
+										'GP',
+										'GS',
+										'W',
+										'L',
+										'ERA',
+										'WHIP',
+										'IP',
+										'H',
+										'HR',
+										'BB',
+										'SO',
+										'R',
+										'ER',
+										'SV',
+										'BS',
+										'HOLD',
+										'WP'
+									].map(stat => (
+										<TableCell sx={{ fontWeight: 'bold' }}>{stat}</TableCell>
+									))}
 								</TableRow>
 							</TableHead>
 							<TableBody>
