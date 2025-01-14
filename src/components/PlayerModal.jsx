@@ -18,9 +18,35 @@ import {
 	calculateOPS
 } from '../utils/hittingStatsCalculations'
 import { calculateEarnedRunAverage } from '../utils/pitchingStatsCaclulations'
+import pitchingStatsConfig from '../utils/pitchingStatsConfig'
+import hittingStatsConfig from '../utils/hittingStatsConfig'
 
 const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 	const playerData = setPlayerData
+
+	const getStatValue = (playerData, key) => {
+		if (key === 'calculateEarnedRunAverage') {
+			return calculateEarnedRunAverage(playerData)
+		}
+		if (key === 'calculatePlateAppearances') {
+			return calculatePlateAppearances(playerData)
+		}
+		if (key === 'calculateOBP') {
+			return calculateOBP(playerData)
+		}
+		if (key === 'calculateSlugging') {
+			return calculateSlugging(playerData)
+		}
+		if (key === 'calculateOPS') {
+			return calculateOPS(playerData)
+		}
+		return key
+			.split('.')
+			.reduce(
+				(obj, k) => (obj && obj[k] !== 'undefined' ? obj[k] : null),
+				playerData?.stats
+			)
+	}
 
 	const style = {
 		position: 'absolute',
@@ -105,52 +131,20 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 									Pitching Stats
 								</Typography>
 								<TableRow>
-									{[
-										'GP',
-										'GS',
-										'W',
-										'L',
-										'ERA',
-										'WHIP',
-										'IP',
-										'H',
-										'HR',
-										'BB',
-										'SO',
-										'R',
-										'ER',
-										'SV',
-										'BS',
-										'HOLD',
-										'WP'
-									].map(stat => (
-										<TableCell sx={{ fontWeight: 'bold' }}>{stat}</TableCell>
+									{pitchingStatsConfig.map((stat, index) => (
+										<TableCell key={index} sx={{ fontWeight: 'bold' }}>
+											{stat.heading}
+										</TableCell>
 									))}
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								<TableRow>
-									<TableCell>{playerData?.stats.gamesPlayed}</TableCell>
-									<TableCell>{playerData?.stats.gamesStarted}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.Win}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.Loss}</TableCell>
-									<TableCell>{calculateEarnedRunAverage(playerData)}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.WHIP}</TableCell>
-									<TableCell>
-										{playerData?.stats.Pitching.InningsPitched}
-									</TableCell>
-									<TableCell>{playerData?.stats.Pitching.H}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.HR}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.BB}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.SO}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.R}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.ER}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.Save}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.BlownSave}</TableCell>
-									<TableCell>{playerData?.stats.Pitching.Hold}</TableCell>
-									<TableCell>
-										{playerData?.stats.Pitching['Wild Pitch']}
-									</TableCell>
+									{pitchingStatsConfig.map((stat, index) => (
+										<TableCell key={index}>
+											{getStatValue(playerData, stat.key)}
+										</TableCell>
+									))}
 								</TableRow>
 							</TableBody>
 						</Table>
@@ -224,46 +218,20 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 						<TableHead>
 							<Typography sx={{ fontWeight: 'bold' }}>Hitting Stats</Typography>
 							<TableRow>
-								<TableCell sx={{ fontWeight: 'bold' }}>GP</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>PA</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>AB</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>R</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>H</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>2B</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>3B</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>HR</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>RBI</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>BB</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>SO</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>AVG</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>OBP</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>SLG</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>OPS</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>HBP</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>SF</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>TB</TableCell>
+								{hittingStatsConfig.map((stat, index) => (
+									<TableCell key={index} sx={{ fontWeight: 'bold' }}>
+										{stat.heading}
+									</TableCell>
+								))}
 							</TableRow>
 						</TableHead>
 						<TableBody>
 							<TableRow>
-								<TableCell>{playerData?.stats.gamesPlayed}</TableCell>
-								<TableCell>{calculatePlateAppearances(playerData)}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.AB}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.R}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.H}</TableCell>
-								<TableCell>{playerData?.stats.Hitting['2B']}</TableCell>
-								<TableCell>{playerData?.stats.Hitting['3B']}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.HR}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.RBI}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.BB}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.SO}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.avg}</TableCell>
-								<TableCell>{calculateOBP(playerData)}</TableCell>
-								<TableCell>{calculateSlugging(playerData)}</TableCell>
-								<TableCell>{calculateOPS(playerData)}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.HBP}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.SF}</TableCell>
-								<TableCell>{playerData?.stats.Hitting.TB}</TableCell>
+								{hittingStatsConfig.map((stat, index) => (
+									<TableCell key={index}>
+										{getStatValue(playerData, stat.key)}
+									</TableCell>
+								))}
 							</TableRow>
 						</TableBody>
 					</Table>
