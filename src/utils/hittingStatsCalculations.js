@@ -1,4 +1,4 @@
-export const calculateSlugging = playerData => {
+export const calculateSlugging = (playerData, key) => {
 	const single =
 		playerData?.stats.Hitting.H -
 		playerData?.stats.Hitting['2B'] -
@@ -12,7 +12,7 @@ export const calculateSlugging = playerData => {
 	return slg.toFixed(3).replace(/^0/, '')
 }
 
-export const calculatePlateAppearances = playerData => {
+export const calculatePlateAppearances = (playerData, key) => {
 	const ab = Number(playerData?.stats.Hitting.AB)
 	const bb = Number(playerData?.stats.Hitting.BB)
 	const ibb = Number(playerData?.stats.Hitting.IBB)
@@ -24,7 +24,7 @@ export const calculatePlateAppearances = playerData => {
 	return pa
 }
 
-export const calculateOBP = playerData => {
+export const calculateOBP = (playerData, key) => {
 	const hits = Number(playerData?.stats.Hitting.H)
 	const walks = Number(playerData?.stats.Hitting.BB)
 	const hitByPitch = Number(playerData?.stats.Hitting.HBP)
@@ -34,7 +34,7 @@ export const calculateOBP = playerData => {
 	return obp.toFixed(3).replace(/^0/, '')
 }
 
-export const calculateOPS = playerData => {
+export const calculateOPS = (playerData, key) => {
 	const obp = Number(calculateOBP(playerData))
 	const slg = Number(calculateSlugging(playerData))
 	const ops = obp + slg

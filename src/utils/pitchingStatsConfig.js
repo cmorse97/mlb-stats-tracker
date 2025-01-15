@@ -1,21 +1,24 @@
+import { getStatValue } from './getStatValue'
+import { calculateEarnedRunAverage } from './pitchingStatsCaclulations'
+
 const pitchingStatsConfig = [
-	{ heading: 'GP', key: 'gamesPlayed' },
-	{ heading: 'GS', key: 'gamesStarted' },
-	{ heading: 'W', key: 'Pitching.Win' },
-	{ heading: 'L', key: 'Pitching.Loss' },
-	{ heading: 'ERA', key: 'calculateEarnedRunAverage' },
-	{ heading: 'WHIP', key: 'Pitching.WHIP' },
-	{ heading: 'IP', key: 'Pitching.InningsPitched' },
-	{ heading: 'H', key: 'Pitching.H' },
-	{ heading: 'HR', key: 'Pitching.HR' },
-	{ heading: 'BB', key: 'Pitching.BB' },
-	{ heading: 'SO', key: 'Pitching.SO' },
-	{ heading: 'R', key: 'Pitching.R' },
-	{ heading: 'ER', key: 'Pitching.ER' },
-	{ heading: 'SV', key: 'Pitching.Save' },
-	{ heading: 'BS', key: 'Pitching.BlownSave' },
-	{ heading: 'HOLD', key: 'Pitching.Hold' },
-	{ heading: 'WP', key: 'Pitching.Wild Pitch' }
+	{ key: 'GP', callBack: getStatValue },
+	{ key: 'GS', callBack: getStatValue },
+	{ key: 'W', callBack: getStatValue },
+	{ key: 'L', callBack: getStatValue },
+	{ key: 'ERA', callBack: calculateEarnedRunAverage },
+	{ key: 'WHIP', callBack: getStatValue },
+	{ key: 'IP', callBack: getStatValue },
+	{ key: 'H', callBack: getStatValue },
+	{ key: 'HR', callBack: getStatValue },
+	{ key: 'BB', callBack: getStatValue },
+	{ key: 'SO', callBack: getStatValue },
+	{ key: 'R', callBack: getStatValue },
+	{ key: 'ER', callBack: getStatValue },
+	{ key: 'SV', callBack: getStatValue },
+	{ key: 'BS', callBack: getStatValue },
+	{ key: 'HOLD', callBack: getStatValue },
+	{ key: 'WP', callBack: getStatValue }
 ]
 
 export default pitchingStatsConfig

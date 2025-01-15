@@ -1,4 +1,4 @@
-export const calculateEarnedRunAverage = playerData => {
+export const calculateEarnedRunAverage = (playerData, key) => {
 	// 9 X earned runs/innings pitched
 	const earnedRuns = Number(playerData?.stats.Pitching.ER)
 	const inningsPitched = Number(playerData?.stats.Pitching.InningsPitched)
