@@ -1,24 +1,28 @@
-import { getStatValue } from './getStatValue'
-import { calculateEarnedRunAverage } from './pitchingStatsCaclulations'
+import {
+	processStatValue,
+	processGPValue,
+	processGSValue,
+	calculateEarnedRunAverage
+} from './statCalculations'
 
 const pitchingStatsConfig = [
-	{ key: 'GP', callBack: getStatValue },
-	{ key: 'GS', callBack: getStatValue },
-	{ key: 'W', callBack: getStatValue },
-	{ key: 'L', callBack: getStatValue },
+	{ key: 'GP', callBack: processGPValue },
+	{ key: 'GS', callBack: processGSValue },
+	{ key: 'W', callBack: processStatValue },
+	{ key: 'L', callBack: processStatValue },
 	{ key: 'ERA', callBack: calculateEarnedRunAverage },
-	{ key: 'WHIP', callBack: getStatValue },
-	{ key: 'IP', callBack: getStatValue },
-	{ key: 'H', callBack: getStatValue },
-	{ key: 'HR', callBack: getStatValue },
-	{ key: 'BB', callBack: getStatValue },
-	{ key: 'SO', callBack: getStatValue },
-	{ key: 'R', callBack: getStatValue },
-	{ key: 'ER', callBack: getStatValue },
-	{ key: 'SV', callBack: getStatValue },
-	{ key: 'BS', callBack: getStatValue },
-	{ key: 'HOLD', callBack: getStatValue },
-	{ key: 'WP', callBack: getStatValue }
+	{ key: 'WHIP', callBack: processStatValue },
+	{ key: 'IP', callBack: processStatValue },
+	{ key: 'H', callBack: processStatValue },
+	{ key: 'HR', callBack: processStatValue },
+	{ key: 'BB', callBack: processStatValue },
+	{ key: 'SO', callBack: processStatValue },
+	{ key: 'R', callBack: processStatValue },
+	{ key: 'ER', callBack: processStatValue },
+	{ key: 'SV', callBack: processStatValue },
+	{ key: 'BS', callBack: processStatValue },
+	{ key: 'HOLD', callBack: processStatValue },
+	{ key: 'WP', callBack: processStatValue }
 ]
 
 export default pitchingStatsConfig

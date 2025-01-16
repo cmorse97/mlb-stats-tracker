@@ -1,6 +1,23 @@
 import { Box, Avatar, Typography, Button } from '@mui/material'
 
 const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
+	if (!playerData) {
+		return null
+	}
+
+	const {
+		longName,
+		mlbHeadshot,
+		pos,
+		jerseyNum,
+		team,
+		bat,
+		height,
+		weight,
+		highSchool,
+		bDay
+	} = playerData
+
 	return (
 		<Box display='flex' sx={{ gap: '4em', padding: '2em' }}>
 			<Box
@@ -12,12 +29,12 @@ const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
 				sx={{ flexDirection: 'column' }}
 			>
 				<Avatar
-					alt={playerData?.longName}
-					src={playerData?.mlbHeadshot}
+					alt={longName}
+					src={mlbHeadshot}
 					sx={{ width: 128, height: 128 }}
 				/>
 				<Typography id='modal-modal-title' variant='h6' component='h2'>
-					{playerData?.longName}
+					{longName}
 				</Typography>
 			</Box>
 			<Box
@@ -27,22 +44,23 @@ const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
 			>
 				{/* Player information, ex: DOB, height, weight */}
 				<Typography>
-					<span className='font-semibold'>Position:</span> {playerData?.pos}{' '}
-					<span className='font-semibold'>Number:</span> {playerData?.jerseyNum}{' '}
+					<span className='font-semibold'>Position:</span> {pos}{' '}
+					<span className='font-semibold'>Number:</span> {jerseyNum}{' '}
 				</Typography>
 				<Typography>
-					<span className='font-semibold'>Team:</span> {playerData?.team}{' '}
+					<span className='font-semibold'>Team:</span> {team}{' '}
 				</Typography>
 				<Typography>
-					<span className='font-semibold'>Bats:</span> {playerData?.bat}{' '}
-					<span className='font-semibold'>Throws:</span> {playerData?.throw}
+					<span className='font-semibold'>Bats:</span> {bat}{' '}
+					{/* getting an unexpected token error due to throw being a reserved keyword */}
+					<span className='font-semibold'>Throws:</span> {playerData.throw}
 				</Typography>
 				<Typography>
-					{playerData?.height}, {playerData?.weight} lbs.
+					{height}, {weight} lbs.
 				</Typography>
-				<Typography>{playerData?.highSchool}</Typography>
+				<Typography>{highSchool}</Typography>
 				<Typography>
-					<span className='font-semibold'>Born:</span> {playerData?.bDay}
+					<span className='font-semibold'>Born:</span> {bDay}
 				</Typography>
 			</Box>
 			<Box position='absolute' top='20px' right='20px'>

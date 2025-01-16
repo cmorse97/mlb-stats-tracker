@@ -1,8 +1,6 @@
 import {
-	Button,
 	Box,
 	Typography,
-	Avatar,
 	TableContainer,
 	Table,
 	TableRow,
@@ -31,7 +29,7 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 		p: 4
 	}
 
-	return playerData?.pos === 'P' ? (
+	return playerData.pos === 'P' ? (
 		<Box sx={style}>
 			<PlayerInfo
 				playerData={playerData}
