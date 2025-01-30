@@ -15,7 +15,8 @@ const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
 		height,
 		weight,
 		highSchool,
-		bDay
+		bDay,
+		throw: thr
 	} = playerData
 
 	return (
@@ -53,7 +54,7 @@ const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
 				<Typography>
 					<span className='font-semibold'>Bats:</span> {bat}{' '}
 					{/* getting an unexpected token error due to throw being a reserved keyword */}
-					<span className='font-semibold'>Throws:</span> {playerData.throw}
+					<span className='font-semibold'>Throws:</span> {thr}
 				</Typography>
 				<Typography>
 					{height}, {weight} lbs.

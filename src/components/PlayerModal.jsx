@@ -16,6 +16,11 @@ import hittingStatsConfig from '../utils/hittingStatsConfig'
 
 const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 	const playerData = setPlayerData
+	const isPlayerPitcher = playerData.pos === 'P'
+	const configStatsToUse = isPlayerPitcher
+		? pitchingStatsConfig
+		: hittingStatsConfig
+	const heading = isPlayerPitcher ? 'Pitching Stats' : 'Hitting Stats'
 
 	const style = {
 		position: 'absolute',
@@ -29,7 +34,7 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 		p: 4
 	}
 
-	return playerData.pos === 'P' ? (
+	return (
 		<Box sx={style}>
 			<PlayerInfo
 				playerData={playerData}
@@ -42,20 +47,18 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 					<TableContainer>
 						<Table>
 							<TableHead>
-								<Typography sx={{ fontWeight: 'bold' }}>
-									Pitching Stats
-								</Typography>
+								<Typography sx={{ fontWeight: 'bold' }}>{heading}</Typography>
 								<TableRow>
-									{pitchingStatsConfig.map((stat, index) => (
+									{configStatsToUse.map((stat, index) => (
 										<TableCell key={index} sx={{ fontWeight: 'bold' }}>
 											{stat.key}
 										</TableCell>
-									))}
+									))}{' '}
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								<TableRow>
-									{pitchingStatsConfig.map((stat, index) => (
+									{configStatsToUse.map((stat, index) => (
 										<TableCell key={index}>
 											{stat.callBack(playerData, stat.key)}
 										</TableCell>
@@ -65,42 +68,6 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 						</Table>
 					</TableContainer>
 				)}
-			</Box>
-		</Box>
-	) : (
-		<Box sx={style}>
-			<PlayerInfo
-				playerData={playerData}
-				handlePlayerModalClose={handlePlayerModalClose}
-			/>
-
-			<Box p={4} sx={{ border: '1px solid grey', borderRadius: '12px' }}>
-				<TableContainer>
-					<Table>
-						<TableHead>
-							<Typography sx={{ fontWeight: 'bold' }}>Hitting Stats</Typography>
-							<TableRow>
-								{hittingStatsConfig.map((stat, index) => (
-									<TableCell
-										key={index}
-										sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}
-									>
-										{stat.key}
-									</TableCell>
-								))}
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							<TableRow>
-								{hittingStatsConfig.map((stat, index) => (
-									<TableCell key={index}>
-										{stat.callBack(playerData, stat.key)}
-									</TableCell>
-								))}
-							</TableRow>
-						</TableBody>
-					</Table>
-				</TableContainer>
 			</Box>
 		</Box>
 	)
