@@ -1,49 +1,35 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { CircularProgress, Container, Box, Paper, Grid } from '@mui/material'
-import axios from 'axios'
-
+import { supabase } from '../utils/supabase'
 const Teams = () => {
 	const [teamsData, setTeamsData] = useState([])
 
 	useEffect(() => {
 		const fetchTeamsData = async () => {
-			const options = {
-				params: {
-					teamStats: 'true',
-					topPerformers: 'true'
-				},
-				headers: {
-					'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-					'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
-				}
+			const { data: teams, error } = await supabase.from('teams').select()
+
+			if (error) {
+				console.error('Error fetching teams data:', error)
+				return
 			}
 
-			const apiUrl = import.meta.env.VITE_API_URL_TEAMS
-
-			axios
-				.get(apiUrl, options)
-				.then(response => {
-					const teams = response.data.body
-					setTeamsData(teams)
-				})
-				.catch(err => console.log(err))
+			setTeamsData(teams)
 		}
-
 		fetchTeamsData()
 	}, [])
 
 	return (
 		<Container maxWidth='lg'>
-			<Grid container spacing={4} mx='auto'>
+			<Grid container spacing={2} mx='auto'>
 				{!teamsData.length ? (
 					<Box mx='auto'>
 						<CircularProgress />
 					</Box>
 				) : (
 					teamsData.map(team => (
-						<Grid item xs={6} sm={2} key={team.teamID}>
-							<Link to={`/team/${team.teamAbv}`}>
+						<Grid item xs={6} sm={3} md={2} key={team.id}>
+							<Link to={`/team/${team.team_abv}`}>
 								<Box
 									p={2}
 									component={Paper}
@@ -58,8 +44,8 @@ const Teams = () => {
 									}}
 								>
 									<img
-										src={team.mlbLogo1}
-										alt={`${team.teamCity} ${team.teamName}`}
+										src={team.logo}
+										alt={`${team.city} ${team.name}`}
 										style={{
 											maxWidth: '100%',
 											maxHeight: '100%',

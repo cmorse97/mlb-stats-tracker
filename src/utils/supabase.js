@@ -1,23 +1,22 @@
-import 'dotenv/config'
 import { createClient } from '@supabase/supabase-js'
 import axios from 'axios'
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL
-const supabaseKey = process.env.VITE_SUPABASE_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 const fetchTeamRoster = async teamAbv => {
 	const options = {
 		method: 'GET',
-		url: process.env.VITE_API_URL_TEAM_ROSTER,
+		url: import.meta.env.VITE_API_URL_TEAM_ROSTER,
 		params: {
 			teamAbv: teamAbv,
 			getStats: 'true'
 		},
 		headers: {
-			'x-rapidapi-key': process.env.VITE_API_KEY,
-			'x-rapidapi-host': process.env.VITE_API_HOST
+			'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+			'x-rapidapi-host': import.meta.env.VITE_API_HOST
 		}
 	}
 
