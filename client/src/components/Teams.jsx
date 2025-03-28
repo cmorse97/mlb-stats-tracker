@@ -1,46 +1,60 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { CircularProgress, Container, Box, Paper, Grid } from '@mui/material'
-import { supabase } from '../utils/supabase'
+import { CircularProgress, Container, Box, Grow, Grid } from '@mui/material'
+import { fetchTeams } from '../services/api'
 const Teams = () => {
 	const [teamsData, setTeamsData] = useState([])
+	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
-		const fetchTeamsData = async () => {
-			const { data: teams, error } = await supabase.from('teams').select()
-
-			if (error) {
-				console.error('Error fetching teams data:', error)
-				return
-			}
-
-			setTeamsData(teams)
+		const getTeams = async () => {
+			const data = await fetchTeams()
+			setTeamsData(data)
+			setLoading(false)
 		}
-		fetchTeamsData()
+
+		getTeams()
 	}, [])
+
+	if (loading) {
+		return (
+			<Container maxWidth='lg'>
+				<Box
+					display='flex'
+					flexDirection='column'
+					gap={2}
+					marginTop={16}
+					justifyContent='center'
+					alignItems='center'
+				>
+					<CircularProgress />
+				</Box>
+			</Container>
+		)
+	}
 
 	return (
 		<Container maxWidth='lg'>
-			<Grid container spacing={2} mx='auto'>
-				{!teamsData.length ? (
-					<Box mx='auto'>
-						<CircularProgress />
-					</Box>
-				) : (
-					teamsData.map(team => (
-						<Grid item xs={6} sm={3} md={2} key={team.id}>
+			<Grid container justifyContent='center' alignItems='center' spacing={2}>
+				{teamsData.map(team => (
+					<Grow in={true} timeout={1000} key={team.id}>
+						<Grid size={{ xs: 4, sm: 2, md: 2 }}>
 							<Link to={`/team/${team.team_abv}`}>
 								<Box
 									p={2}
-									component={Paper}
 									sx={{
 										borderRadius: '50%',
 										display: 'flex',
 										justifyContent: 'center',
 										alignItems: 'center',
-										height: '100px',
-										width: '100px',
-										overflow: 'hidden' // Hide overflow to prevent image stretching
+										height: { xs: '60px', md: '75px' },
+										width: { xs: '60px', md: '75px' },
+										overflow: 'hidden', // Hide overflow to prevent image stretching
+										// add a hover effect for lg screen sizes only
+										'&:hover': {
+											transform: 'scale(1.1)',
+											transition: 'transform 0.5s ease-out'
+										}
 									}}
 								>
 									<img
@@ -55,8 +69,8 @@ const Teams = () => {
 								</Box>
 							</Link>
 						</Grid>
-					))
-				)}
+					</Grow>
+				))}
 			</Grid>
 		</Container>
 	)
