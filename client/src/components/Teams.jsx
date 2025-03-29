@@ -45,7 +45,7 @@ const Teams = () => {
 								alignItems='center'
 								sx={{ height: '100%' }}
 							>
-								<Link to={`/team/${team.team_abv}`} style={{}}>
+								<Link to={`/teams/${team.team_abv}`} style={{}}>
 									<Box
 										p={2}
 										sx={{
@@ -53,8 +53,8 @@ const Teams = () => {
 											display: 'flex',
 											justifyContent: 'center',
 											alignItems: 'center',
-											height: { xs: '60px', md: '75px', lg: '100px' },
-											width: { xs: '60px', md: '75px', lg: '100px' },
+											height: '100px',
+											width: '100px',
 											overflow: 'hidden', // Hide overflow to prevent image stretching
 											// add a hover effect for lg screen sizes only
 											'&:hover': {

@@ -17,7 +17,7 @@ const router = createBrowserRouter([
 			{ path: 'standings', element: <Standings /> },
 			{ path: 'top100', element: <Top100 /> },
 			{ path: 'analytics', element: <Analytics /> },
-			{ path: '/team/:teamAbv', element: <RosterPage /> }
+			{ path: '/teams/:teamAbv', element: <RosterPage /> }
 		]
 	}
 ])

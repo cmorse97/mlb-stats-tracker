@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { useParams } from 'react-router-dom'
+import { fetchTeamRoster } from '../services/api'
 import {
 	Avatar,
 	Button,
@@ -12,57 +14,28 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
-	TableSortLabel,
 	Paper
 } from '@mui/material'
-import axios from 'axios'
-import { sortRosterTable } from '../utils/sortRosterTable'
+
+const labels = ['Position', 'Name', 'Number']
 
 const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 	const [rosterData, setRosterData] = useState([])
-	const [sortBy, setSortBy] = useState('pos')
-	const [sortDirection, setSortDirection] = useState('asc')
 	const { teamAbv } = useParams()
 
-	const handleSort = column => {
-		if (sortBy === column) {
-			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-		} else {
-			setSortBy(column)
-			setSortDirection('asc')
-		}
-	}
-
-	const sortedData = sortRosterTable(rosterData, sortBy, sortDirection) // Use sortData function
-
 	useEffect(() => {
-		const fetchRosterData = async () => {
-			const options = {
-				params: {
-					teamAbv: teamAbv,
-					getStats: 'true'
-				},
-				headers: {
-					'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-					'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
-				}
+		const fetchRosterData = async teamAbv => {
+			try {
+				const response = await fetchTeamRoster(teamAbv)
+				setRosterData(response)
+				console.log(response)
+			} catch (error) {
+				console.error('Error fetching team roster:', error)
 			}
-
-			const apiUrl = import.meta.env.VITE_API_URL_TEAM_ROSTER
-
-			axios
-				.get(apiUrl, options)
-				.then(response => {
-					const roster = response.data.body.roster
-					if (roster) {
-						setRosterData(roster)
-					}
-				})
-				.catch(err => console.log(err))
 		}
 
-		fetchRosterData()
-	}, [])
+		fetchRosterData(teamAbv)
+	}, [teamAbv])
 
 	return (
 		<>
@@ -80,42 +53,20 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 					<Table sx={{ minWidth: 'sm' }}>
 						<TableHead>
 							<TableRow>
-								<TableCell align='center'>
-									<TableSortLabel
-										active={sortBy === 'pos'}
-										direction={sortDirection}
-										onClick={() => handleSort('pos')}
-									>
-										Position
-									</TableSortLabel>
-								</TableCell>
-								<TableCell align='center'>
-									<TableSortLabel
-										active={sortBy === 'longName'}
-										direction={sortDirection}
-										onClick={() => handleSort('longName')}
-									>
-										Name
-									</TableSortLabel>
-								</TableCell>
-								<TableCell align='center'>
-									<TableSortLabel
-										active={sortBy === 'jerseyNum'}
-										direction={sortDirection}
-										onClick={() => handleSort('jerseyNum')}
-									>
-										Number
-									</TableSortLabel>
-								</TableCell>
+								{labels.map(label => (
+									<TableCell key={label} align='center'>
+										{label}
+									</TableCell>
+								))}
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{sortedData.map(player => (
+							{rosterData.map((player, index) => (
 								<TableRow
-									key={player.playerID}
+									key={index}
 									sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 								>
-									<TableCell align='center'>{player.pos}</TableCell>
+									<TableCell align='center'>{player.position}</TableCell>
 									<TableCell align='left'>
 										<Box
 											sx={{
@@ -137,17 +88,17 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 												}}
 											>
 												<Avatar
-													src={player.mlbHeadshot}
-													alt={player.longName}
+													src={player.avatar}
+													alt={player.name}
 													sx={{ marginRight: '4px' }}
 												/>
 												<Typography color='black' textAlign='left'>
-													{player.longName}
+													{player.name}
 												</Typography>
 											</Button>
 										</Box>
 									</TableCell>
-									<TableCell align='center'>{player.jerseyNum}</TableCell>
+									<TableCell align='center'>{player.jersey_number}</TableCell>
 								</TableRow>
 							))}
 						</TableBody>
@@ -156,6 +107,12 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 			)}
 		</>
 	)
+}
+
+// Prop Types
+RosterTable.propTypes = {
+	setPlayerData: PropTypes.func,
+	handlePlayerModalOpen: PropTypes.func
 }
 
 export default RosterTable

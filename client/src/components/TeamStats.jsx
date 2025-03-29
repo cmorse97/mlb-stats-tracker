@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { useParams } from 'react-router-dom'
+import { fetchTeam } from '../services/api'
 import {
 	Box,
 	CircularProgress,
@@ -14,90 +14,95 @@ const TeamStats = () => {
 	const { teamAbv } = useParams()
 
 	useEffect(() => {
-		const fetchTeamData = async () => {
-			const options = {
-				params: {
-					teamStats: 'true',
-					topPerformers: 'true'
-				},
-				headers: {
-					'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-					'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
-				}
+		const fetchTeamData = async teamAbv => {
+			try {
+				const response = await fetchTeam(teamAbv)
+				const teamObj = response.length > 0 ? response[0] : null
+
+				setTeamData(teamObj)
+				console.log(teamObj)
+			} catch (error) {
+				console.error('Error fetching team:', error)
 			}
-
-			const apiUrl = import.meta.env.VITE_API_URL_TEAMS
-
-			axios
-				.get(apiUrl, options)
-				.then(response => {
-					const teams = response.data.body
-					const team = teams.find(team => team.teamAbv === teamAbv)
-					console.log(team)
-					setTeamData(team)
-				})
-				.catch(err => console.log(err))
 		}
 
-		fetchTeamData()
-	}, [])
+		fetchTeamData(teamAbv)
+	}, [teamAbv])
 
 	return (
 		<Container maxWidth='lg'>
-			{!Object.keys(teamData).length ? (
+			{!teamData ? (
 				<Box display='flex' alignItems='center' justifyContent='center'>
 					<CircularProgress />
 				</Box>
 			) : (
-				<Grid container spacing={2} my={2}>
-					<Grid item xs={12} sm={6} md={2}>
-						<Box
-							display='flex'
-							justifyContent='center'
-							height='100%' // Ensure the Box takes full height of the Grid item
-						>
+				<Grid
+					container
+					spacing={{ xs: 2, md: 0 }}
+					my={4}
+					alignItems='center'
+					justifyContent='center'
+				>
+					{/* Team Logo */}
+					<Grid item size={{ xs: 12, md: 4 }}>
+						<Box display='flex' justifyContent='center'>
 							<img
-								src={teamData.espnLogo1}
+								src={teamData.logo}
 								alt={teamData.teamAbv}
-								width='100%' // Make the image responsive
-								height='auto' // Maintain aspect ratio
+								style={{
+									width: '80%',
+									maxWidth: '200px',
+									height: 'auto',
+									objectFit: 'contain'
+								}}
 							/>
 						</Box>
 					</Grid>
-					<Grid item xs={12} sm={6} md={2}>
+
+					{/* Team Info */}
+					<Grid item size={{ xs: 6, md: 4 }}>
 						<Box
-							item
-							xs={12}
-							md={6}
 							py={4}
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: { xs: 'center', md: 'flex-start' }, // Center on xs screens, align flex-start on md screens
-								justifyContent: { xs: 'center', md: 'flex-start' } // Center on xs screens, align flex-start on md screens
-							}}
+							display='flex'
+							flexDirection='column'
+							alignItems='center'
+							textAlign='center'
 						>
-							<Typography variant='h5'>
-								{teamData.teamCity} {teamData.teamName}
+							<Typography variant='h5' gutterBottom>
+								{teamData.city} {teamData.name}
 							</Typography>
-							<Typography variant='h6'>
-								{teamData.conferenceAbv} {teamData.division}
+							<Typography variant='h6' gutterBottom color='text.secondary'>
+								{teamData.league_abv} {teamData.division}
 							</Typography>
 							<Typography variant='body1'>
-								({teamData.wins} - {teamData.loss})
+								({teamData.wins} - {teamData.losses})
 							</Typography>
 						</Box>
 					</Grid>
-					<Grid item xs={12} md={8}>
-						<Typography textAlign='center' variant='h6'>
-							Team Stats
-						</Typography>
-						<Box textAlign='center'>
-							<Typography>
-								Runs Scored: <strong>{teamData.RS}</strong>
+
+					{/* Team Stats */}
+					<Grid item size={{ xs: 6, md: 4 }}>
+						<Box
+							textAlign='center'
+							py={4}
+							display='flex'
+							flexDirection='column'
+							alignItems='center'
+						>
+							<Typography variant='h5' gutterBottom>
+								Team Stats
 							</Typography>
-							<Typography>
-								Runs Allowed: <strong>{teamData.RA}</strong>
+							<Typography variant='body1'>
+								Runs Scored:{' '}
+								<Typography component='strong'>
+									{teamData.runs_scored}
+								</Typography>
+							</Typography>
+							<Typography variant='body1'>
+								Runs Allowed:{' '}
+								<Typography component='strong'>
+									{teamData.runs_allowed}
+								</Typography>
 							</Typography>
 						</Box>
 					</Grid>
