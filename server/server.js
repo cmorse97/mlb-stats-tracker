@@ -1,10 +1,10 @@
-import dotenv from 'dotenv'
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import dataRoutes from './routes/dataRoutes.js'
 import teamsRoute from './routes/teamsRoute.js'
+import playersRoute from './routes/playersRoutes.js'
 
-dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 3000
 
@@ -14,8 +14,11 @@ app.use(express.json())
 
 // Routes
 app.use('/api', dataRoutes)
-app.use('/api/teams', teamsRoute)
-app.use('/api/teams/:teamAbv', teamsRoute)
+app.use('/api/teams', teamsRoute) // Get all teams
+app.use('/api/teams/:teamAbv', teamsRoute) // Get single team
+app.use('/api/teams/:teamAbv/roster', teamsRoute) // Get players from a team's roster
+app.use('/api/players', playersRoute) // Get all players
+app.use('/api/players/:playerId', playersRoute) // Get single player by id
 
 // Test route
 app.get('/', (req, res) => {

@@ -26,3 +26,25 @@ export const getTeamByTeamAbv = async (req, res) => {
 		res.status(500).json({ error: 'Error fetching team' })
 	}
 }
+
+export const getRosterByTeamAbv = async (req, res) => {
+	try {
+		const teamAbv = req.params.teamAbv.toUpperCase()
+		console.log('Requested team abbreviation:', teamAbv)
+
+		const { data, error } = await supabase
+			.from('players')
+			.select()
+			.eq('team_abv', teamAbv)
+
+		console.log('Supabase Response:', { data, error })
+
+		if (error) throw error
+		res.status(200).json(data)
+	} catch (error) {
+		console.error(`Error fetching players for team ${teamAbv}:`, error)
+		res
+			.status(500)
+			.json({ error: `Error fetching players for team ${teamAbv}` })
+	}
+}
