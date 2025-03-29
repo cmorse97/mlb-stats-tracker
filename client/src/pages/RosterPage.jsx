@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Container, Modal } from '@mui/material'
-import Navbar from '../components/Navbar'
 import TeamStats from '../components/TeamStats'
 import RosterTable from '../components/RosterTable'
 import TopPerformers from '../components/TopPerformers'
@@ -14,7 +13,6 @@ const RosterPage = () => {
 
 	return (
 		<>
-			<Navbar />
 			<Container maxWidth='lg' sx={{ marginY: '12px' }}>
 				<TeamStats />
 				<TopPerformers />

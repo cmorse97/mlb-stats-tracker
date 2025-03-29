@@ -36,38 +36,45 @@ const Teams = () => {
 	return (
 		<Container maxWidth='lg'>
 			<Grid container justifyContent='center' alignItems='center' spacing={2}>
-				{teamsData.map(team => (
-					<Grow in={true} timeout={1000} key={team.id}>
-						<Grid size={{ xs: 4, sm: 2, md: 2 }}>
-							<Link to={`/team/${team.team_abv}`}>
-								<Box
-									p={2}
-									sx={{
-										borderRadius: '50%',
-										display: 'flex',
-										justifyContent: 'center',
-										alignItems: 'center',
-										height: { xs: '60px', md: '75px' },
-										width: { xs: '60px', md: '75px' },
-										overflow: 'hidden', // Hide overflow to prevent image stretching
-										// add a hover effect for lg screen sizes only
-										'&:hover': {
-											transform: 'scale(1.1)',
-											transition: 'transform 0.5s ease-out'
-										}
-									}}
-								>
-									<img
-										src={team.logo}
-										alt={`${team.city} ${team.name}`}
-										style={{
-											maxWidth: '100%',
-											maxHeight: '100%',
-											objectFit: 'cover'
-										}} // Maintain aspect ratio and cover entire box
-									/>
-								</Box>
-							</Link>
+				{teamsData.map((team, index) => (
+					<Grow in={true} timeout={1000} key={index}>
+						<Grid item size={{ xs: 4, sm: 2, md: 2 }}>
+							<Grid
+								container
+								justifyContent='center'
+								alignItems='center'
+								sx={{ height: '100%' }}
+							>
+								<Link to={`/team/${team.team_abv}`} style={{}}>
+									<Box
+										p={2}
+										sx={{
+											borderRadius: '50%',
+											display: 'flex',
+											justifyContent: 'center',
+											alignItems: 'center',
+											height: { xs: '60px', md: '75px', lg: '100px' },
+											width: { xs: '60px', md: '75px', lg: '100px' },
+											overflow: 'hidden', // Hide overflow to prevent image stretching
+											// add a hover effect for lg screen sizes only
+											'&:hover': {
+												transform: 'scale(1.1)',
+												transition: 'transform 0.5s ease-out'
+											}
+										}}
+									>
+										<img
+											src={team.logo}
+											alt={`${team.city} ${team.name}`}
+											style={{
+												maxWidth: '100%',
+												maxHeight: '100%',
+												objectFit: 'cover'
+											}} // Maintain aspect ratio and cover entire box
+										/>
+									</Box>
+								</Link>
+							</Grid>
 						</Grid>
 					</Grow>
 				))}

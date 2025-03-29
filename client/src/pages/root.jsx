@@ -1,27 +1,25 @@
-import Teams from '../components/Teams'
-import Navbar from '../components/Navbar'
-import { Box, Container, Typography } from '@mui/material'
+import { createBrowserRouter } from 'react-router-dom'
+import Layout from '../components/Layout'
+import Home from '../pages/Home'
+import Standings from '../pages/Standings'
+import Top100 from '../pages/Top100'
+import Analytics from '../pages/Analytics'
+import ErrorPage from '../pages/ErrorPage'
+import RosterPage from '../pages/RosterPage'
 
-const Root = () => {
-	return (
-		<>
-			{/* Implement responsive layout */}
-			<Navbar />
-			<Container maxWidth='lg'>
-				<Box
-					display='flex'
-					flexDirection='column'
-					alignItems='center'
-					justifyContent='center'
-					gap={8}
-					my={4}
-				>
-					<Typography variant='h5'>Pick a team to view roster</Typography>
-					<Teams />
-				</Box>
-			</Container>
-		</>
-	)
-}
+const router = createBrowserRouter([
+	{
+		path: '/',
+		element: <Layout />,
+		errorElement: <ErrorPage />, // Navbar will always be present
+		children: [
+			{ index: true, element: <Home /> },
+			{ path: 'standings', element: <Standings /> },
+			{ path: 'top100', element: <Top100 /> },
+			{ path: 'analytics', element: <Analytics /> },
+			{ path: '/team/:teamAbv', element: <RosterPage /> }
+		]
+	}
+])
 
-export default Root
+export default router

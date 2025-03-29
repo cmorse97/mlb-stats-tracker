@@ -1,179 +1,106 @@
-import * as React from 'react'
-import AppBar from '@mui/material/AppBar'
-import Box from '@mui/material/Box'
-import Toolbar from '@mui/material/Toolbar'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import Menu from '@mui/material/Menu'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import {
+	AppBar,
+	Toolbar,
+	Typography,
+	IconButton,
+	Button,
+	Box,
+	Drawer,
+	List,
+	ListItem,
+	ListItemText,
+	useMediaQuery
+} from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import Container from '@mui/material/Container'
-import Avatar from '@mui/material/Avatar'
-import Button from '@mui/material/Button'
-import Tooltip from '@mui/material/Tooltip'
-import MenuItem from '@mui/material/MenuItem'
-import { useScrollTrigger } from '@mui/material'
-import MultilineChart from '@mui/icons-material/MultilineChart'
+import MultilineChartIcon from '@mui/icons-material/MultilineChart'
 
-const pages = ['Teams', 'Top 100', 'Analytics']
-const settings = ['Profile', 'Account', 'Logout']
+const pages = [
+	{ name: 'Standings', path: 'standings' },
+	{ name: 'Top 100', path: 'top100' },
+	{ name: 'Analytics', path: 'analytics' }
+]
 
-function ResponsiveAppBar() {
-	const [anchorElNav, setAnchorElNav] = React.useState(null)
-	const [anchorElUser, setAnchorElUser] = React.useState(null)
+const Navbar = () => {
+	const isMobile = useMediaQuery('(max-width: 600px)')
+	const [mobileOpen, setMobileOpen] = useState(false)
 
-	const handleOpenNavMenu = event => {
-		setAnchorElNav(event.currentTarget)
-	}
-	const handleOpenUserMenu = event => {
-		setAnchorElUser(event.currentTarget)
-	}
-
-	const handleCloseNavMenu = () => {
-		setAnchorElNav(null)
-	}
-
-	const handleCloseUserMenu = () => {
-		setAnchorElUser(null)
-	}
-
-	function ElevationScroll(props) {
-		const { children, window } = props
-		const trigger = useScrollTrigger({
-			disableHysteresis: true,
-			threshold: 0,
-			target: window ? window() : undefined
-		})
-
-		return children
-			? React.cloneElement(children, { elevation: trigger ? 4 : 0 })
-			: null
+	// Toggle Drawer (Mobile Menu)
+	const handleDrawerToggle = () => {
+		setMobileOpen(!mobileOpen)
 	}
 
 	return (
-		<ElevationScroll elevation={4}>
-			<AppBar position='sticky'>
-				<Container maxWidth='xl'>
-					<Toolbar disableGutters>
-						<MultilineChart
-							sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}
-						/>
-						<Typography
-							variant='h6'
-							noWrap
-							component='a'
-							href='/'
-							sx={{
-								mr: 2,
-								display: { xs: 'none', md: 'flex' },
-								fontWeight: 700,
-								letterSpacing: '.125rem',
-								color: 'inherit',
-								textDecoration: 'none'
-							}}
-						>
-							MLB Stats Tracker
-						</Typography>
-
-						<Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-							<IconButton
-								size='large'
-								aria-label='account of current user'
-								aria-controls='menu-appbar'
-								aria-haspopup='true'
-								onClick={handleOpenNavMenu}
-								color='inherit'
-							>
-								<MenuIcon />
-							</IconButton>
-							<Menu
-								id='menu-appbar'
-								anchorEl={anchorElNav}
-								anchorOrigin={{
-									vertical: 'bottom',
-									horizontal: 'left'
-								}}
-								keepMounted
-								transformOrigin={{
-									vertical: 'top',
-									horizontal: 'left'
-								}}
-								open={Boolean(anchorElNav)}
-								onClose={handleCloseNavMenu}
-								sx={{ display: { xs: 'block', md: 'none' } }}
-							>
-								{pages.map(page => (
-									<MenuItem key={page} onClick={handleCloseNavMenu}>
-										<Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-									</MenuItem>
-								))}
-							</Menu>
+		<Box sx={{ flexGrow: 1 }}>
+			<AppBar position='static'>
+				<Toolbar>
+					{/* Logo / App Name */}
+					<Link
+						to='/'
+						style={{ textDecoration: 'none', color: '#fff', flexGrow: 1 }}
+					>
+						<Box display='flex' alignItems='center' gap={1}>
+							<MultilineChartIcon fontSize='large' />
+							<Typography variant='h6' sx={{ fontWeight: 'bold' }}>
+								MLB Stats Tracker
+							</Typography>
 						</Box>
-						<MultilineChart
-							sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}
-						/>
-						<Typography
-							variant='h5'
-							noWrap
-							component='a'
-							href='/'
-							sx={{
-								mr: 2,
-								display: { xs: 'flex', md: 'none' },
-								flexGrow: 1,
-								fontWeight: 700,
-								letterSpacing: '.125rem',
-								color: 'inherit',
-								textDecoration: 'none'
-							}}
-						>
-							MLB Stats Tracker
-						</Typography>
-						<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+					</Link>
+
+					{/* Desktop Navigation (Shown on medium & larger screens) */}
+					{!isMobile ? (
+						<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 							{pages.map(page => (
-								<Button
-									key={page}
-									onClick={handleCloseNavMenu}
-									sx={{ my: 2, color: 'white', display: 'block' }}
-								>
-									{page}
+								<Button key={page.name} sx={{ color: '#fff' }}>
+									<Link
+										to={`/${page.path}`}
+										style={{ color: '#fff', textDecoration: 'none' }}
+									>
+										{page.name}
+									</Link>
 								</Button>
 							))}
 						</Box>
-						<Box sx={{ flexGrow: 0 }}>
-							<Tooltip title='Open settings'>
-								<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-									<Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
-								</IconButton>
-							</Tooltip>
-							<Menu
-								sx={{ mt: '45px' }}
-								id='menu-appbar'
-								anchorEl={anchorElUser}
-								anchorOrigin={{
-									vertical: 'top',
-									horizontal: 'right'
-								}}
-								keepMounted
-								transformOrigin={{
-									vertical: 'top',
-									horizontal: 'right'
-								}}
-								open={Boolean(anchorElUser)}
-								onClose={handleCloseUserMenu}
-							>
-								{settings.map(setting => (
-									<MenuItem key={setting} onClick={handleCloseUserMenu}>
-										<Typography sx={{ textAlign: 'center' }}>
-											{setting}
-										</Typography>
-									</MenuItem>
-								))}
-							</Menu>
-						</Box>
-					</Toolbar>
-				</Container>
+					) : (
+						// Mobile Menu Button (Hamburger)
+						<IconButton color='inherit' onClick={handleDrawerToggle}>
+							<MenuIcon />
+						</IconButton>
+					)}
+				</Toolbar>
 			</AppBar>
-		</ElevationScroll>
+
+			{/* Mobile Drawer Menu */}
+			<Drawer
+				anchor='right'
+				open={mobileOpen}
+				onClose={handleDrawerToggle}
+				transitionDuration={500}
+				sx={{
+					flexShrink: 0,
+					'& .MuiDrawer-paper': { width: '33%', boxSizing: 'border-box' }
+				}}
+			>
+				<List>
+					{pages.map(page => (
+						<ListItem button key={page.name} onClick={handleDrawerToggle}>
+							<Link
+								to={`/${page.path}`}
+								style={{
+									textDecoration: 'none',
+									color: 'inherit',
+									width: '100%'
+								}}
+							>
+								<ListItemText primary={page.name} />
+							</Link>
+						</ListItem>
+					))}
+				</List>
+			</Drawer>
+		</Box>
 	)
 }
-export default ResponsiveAppBar
+
+export default Navbar
