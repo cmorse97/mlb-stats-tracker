@@ -1,50 +1,73 @@
 import supabase from '../utils/supabaseClient.js'
 
-// Get all teams from supabase
 export const getAllTeams = async (req, res) => {
 	try {
-		const { data, error } = await supabase.from('teams').select()
+		const { data: teams, error } = await supabase
+			.from('teams')
+			.select()
+			.order('id', { ascending: true })
+
 		if (error) throw error
-		res.status(200).json(data)
-	} catch (error) {
-		console.error('Error fetching teams:', error)
-		res.status(500).json({ error: 'Error fetching teams' })
+
+		res.status(200).json({
+			statusCode: 200,
+			message: 'Teams fetched successfully',
+			body: teams
+		})
+	} catch (err) {
+		console.error('Error fetching teams:', err)
+		res
+			.status(500)
+			.json({ message: 'Failed to fetch teams', error: err.message })
 	}
 }
 
 export const getTeamByTeamAbv = async (req, res) => {
+	const teamAbv = req.params.teamAbv.toUpperCase()
 	try {
-		const teamAbv = req.params.teamAbv
-		const { data, error } = await supabase
+		const { data: team, error } = await supabase
 			.from('teams')
 			.select()
 			.eq('team_abv', teamAbv)
+			.single()
+
 		if (error) throw error
-		res.status(200).json(data)
-	} catch (error) {
-		console.error('Error fetching team:', error)
-		res.status(500).json({ error: 'Error fetching team' })
+
+		res.status(200).json({
+			statusCode: 200,
+			message: `Team data for ${teamAbv} fetched successfully`,
+			body: team
+		})
+	} catch (err) {
+		console.error(`Error fetching team data for ${teamAbv}:`, err)
+		res.status(500).json({
+			message: `Failed to fetch team data for ${teamAbv}`,
+			error: err.message
+		})
 	}
 }
 
 export const getRosterByTeamAbv = async (req, res) => {
+	const teamAbv = req.params.teamAbv.toUpperCase()
 	try {
-		const teamAbv = req.params.teamAbv.toUpperCase()
-		console.log('Requested team abbreviation:', teamAbv)
-
-		const { data, error } = await supabase
+		const { data: roster, error } = await supabase
 			.from('players')
 			.select()
 			.eq('team_abv', teamAbv)
-
-		console.log('Supabase Response:', { data, error })
+			.order('name', { ascending: true })
 
 		if (error) throw error
-		res.status(200).json(data)
-	} catch (error) {
-		console.error(`Error fetching players for team ${teamAbv}:`, error)
-		res
-			.status(500)
-			.json({ error: `Error fetching players for team ${teamAbv}` })
+
+		res.status(200).json({
+			statusCode: 200,
+			message: `Roster for ${teamAbv} fetched successfully`,
+			body: roster
+		})
+	} catch (err) {
+		console.error(`Error fetching roster for ${teamAbv}:`, err)
+		res.status(500).json({
+			message: `Failed to fetch roster for ${teamAbv}`,
+			error: err.message
+		})
 	}
 }

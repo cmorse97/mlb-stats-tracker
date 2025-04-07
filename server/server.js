@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import dataRoutes from './routes/dataRoutes.js'
-import teamsRoute from './routes/teamsRoute.js'
+// import dataRoutes from './routes/dataRoutes.js'
+import teamsRoutes from './routes/teamsRoutes.js'
 import playersRoute from './routes/playersRoutes.js'
 
 const app = express()
@@ -13,10 +13,10 @@ app.use(cors())
 app.use(express.json())
 
 // Routes
-app.use('/api', dataRoutes)
-app.use('/api/teams', teamsRoute) // Get all teams
-app.use('/api/teams/:teamAbv', teamsRoute) // Get single team
-app.use('/api/teams/:teamAbv/roster', teamsRoute) // Get players from a team's roster
+// app.use('/api', dataRoutes)
+app.use('/api/teams', teamsRoutes) // Get all teams
+app.use('/api/teams/:teamAbv', teamsRoutes) // Get single team
+app.use('/api/teams/:teamAbv/roster', teamsRoutes) // Get players from a team's roster
 app.use('/api/players', playersRoute) // Get all players
 app.use('/api/players/:playerId', playersRoute) // Get single player by id
 
@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 })
 
 // Cron job
-import cron from './utils/cronJob.js'
+// import cron from './utils/cronJob.js'
 
 // Start server
 app.listen(PORT, () => {
