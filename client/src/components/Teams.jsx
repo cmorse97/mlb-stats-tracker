@@ -36,8 +36,8 @@ const Teams = () => {
 	return (
 		<Container maxWidth='lg'>
 			<Grid container justifyContent='center' alignItems='center' spacing={2}>
-				{teamsData.map((team, index) => (
-					<Grow in={true} timeout={1000} key={index}>
+				{teamsData.map(({ team_abv, city, name, logo }) => (
+					<Grow in={true} timeout={1000} key={team_abv}>
 						<Grid item size={{ xs: 4, sm: 2, md: 2 }}>
 							<Grid
 								container
@@ -45,7 +45,7 @@ const Teams = () => {
 								alignItems='center'
 								sx={{ height: '100%' }}
 							>
-								<Link to={`/teams/${team.team_abv}`} style={{}}>
+								<Link to={`/teams/${team_abv}`} style={{}}>
 									<Box
 										p={2}
 										sx={{
@@ -64,8 +64,8 @@ const Teams = () => {
 										}}
 									>
 										<img
-											src={team.logo}
-											alt={`${team.city} ${team.name}`}
+											src={logo}
+											alt={`${city} ${name}`}
 											style={{
 												maxWidth: '100%',
 												maxHeight: '100%',

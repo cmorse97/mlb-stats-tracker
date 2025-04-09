@@ -8,19 +8,43 @@ import {
 	TableHead,
 	TableCell
 } from '@mui/material'
+import PropTypes from 'prop-types'
 
 import PlayerInfo from './PlayerInfo'
 
-import pitchingStatsConfig from '../utils/pitchingStatsConfig'
-import hittingStatsConfig from '../utils/hittingStatsConfig'
-
 const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 	const playerData = setPlayerData
-	const isPlayerPitcher = playerData.pos === 'P'
-	const configStatsToUse = isPlayerPitcher
-		? pitchingStatsConfig
-		: hittingStatsConfig
+	const isPlayerPitcher = playerData.position === 'P'
 	const heading = isPlayerPitcher ? 'Pitching Stats' : 'Hitting Stats'
+
+	const statKeyMap = {
+		InningsPitched: 'IP',
+		'Wild Pitch': 'WP',
+		Win: 'W',
+		Loss: 'L',
+		Save: 'SV',
+		BlownSave: 'BS',
+		CompleteGame: 'CG',
+		ShutOut: 'SHO'
+	}
+
+	const hiddenKeys = [
+		'PerfectGame',
+		'Flyouts',
+		'Pitches',
+		'NoHitter',
+		'Strikes',
+		'Groundouts',
+		'Batters Faced'
+	]
+
+	const statData = isPlayerPitcher
+		? playerData.stats?.Pitching || {}
+		: playerData.stats?.Hitting || {}
+
+	const statEntries = Object.entries(statData).filter(
+		([key]) => !hiddenKeys.includes(key)
+	)
 
 	const style = {
 		position: 'absolute',
@@ -41,27 +65,38 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 				handlePlayerModalClose={handlePlayerModalClose}
 			/>
 			<Box p={4} sx={{ border: '1px solid grey', borderRadius: '12px' }}>
-				{!Object.keys(playerData.stats).length ? (
+				{!statEntries.length ? (
 					<Typography>No stats available</Typography>
 				) : (
 					<TableContainer>
 						<Table>
 							<TableHead>
-								<Typography sx={{ fontWeight: 'bold' }}>{heading}</Typography>
 								<TableRow>
-									{configStatsToUse.map((stat, index) => (
-										<TableCell key={index} sx={{ fontWeight: 'bold' }}>
-											{stat.key}
+									<TableCell colSpan={statEntries.length}>
+										<Typography sx={{ fontWeight: 'bold' }}>
+											{heading}
+										</Typography>
+									</TableCell>
+								</TableRow>
+								<TableRow>
+									{statEntries.map(([key]) => (
+										<TableCell
+											key={key}
+											sx={{
+												fontWeight: 'bold',
+												textAlign: 'center',
+												textTransform: 'uppercase'
+											}}
+										>
+											{statKeyMap[key] || key}
 										</TableCell>
-									))}{' '}
+									))}
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								<TableRow>
-									{configStatsToUse.map((stat, index) => (
-										<TableCell key={index}>
-											{stat.callBack(playerData, stat.key)}
-										</TableCell>
+									{statEntries.map(([_, value], index) => (
+										<TableCell key={index}>{value}</TableCell>
 									))}
 								</TableRow>
 							</TableBody>
@@ -71,6 +106,11 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
 			</Box>
 		</Box>
 	)
+}
+
+PlayerModal.propTypes = {
+	setPlayerData: PropTypes.object.isRequired,
+	handlePlayerModalClose: PropTypes.func.isRequired
 }
 
 export default PlayerModal

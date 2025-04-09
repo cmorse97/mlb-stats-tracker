@@ -1,39 +1,38 @@
+import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL
 
 // Get teams from backend
 export const fetchTeams = async () => {
 	try {
-		console.log('Fetching teams data from API...')
-		const response = await fetch(`${API_URL}/teams`)
-		if (!response.ok) throw new Error('Failed to fetch teams data from API')
-		console.log(response)
-		return await response.json()
+		const response = await axios.get(`${API_URL}/teams`)
+		const teams = await response.data.body
+		return teams
 	} catch (error) {
 		console.error('Error fetching teams data from API:', error.message)
-		return []
+		return null
 	}
 }
 
 // Get a team by teamAbv from backend
-export const fetchTeam = async teamAbv => {
+export const fetchTeamByTeamAbv = async teamAbv => {
 	try {
-		const response = await fetch(`${API_URL}/teams/${teamAbv}`)
-		if (!response.ok) throw new Error('Failed to fetch team')
-		return await response.json()
+		const response = await axios.get(`${API_URL}/teams/${teamAbv}`)
+		const team = await response.data.body
+		return team
 	} catch (error) {
 		console.error('Error fetching team:', error)
-		return []
+		return null
 	}
 }
 
 // Get roster by teamAbv from backend
-export const fetchTeamRoster = async teamAbv => {
+export const fetchRosterByTeamAbv = async teamAbv => {
 	try {
-		const response = await fetch(`${API_URL}/teams/${teamAbv}/roster`)
-		if (!response.ok) throw new Error('Failed to fetch team roster')
-		return await response.json()
+		const response = await axios.get(`${API_URL}/teams/${teamAbv}/roster`)
+		const teamRoster = await response.data.body
+		return teamRoster
 	} catch (error) {
 		console.error('Error fetching team roster:', error)
-		return []
+		return null
 	}
 }

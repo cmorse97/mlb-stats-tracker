@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router-dom'
-import { fetchTeamRoster } from '../services/api'
+import { fetchRosterByTeamAbv } from '../services/api'
+import { quickSortRoster } from '../utils/sortRosterTable'
 import {
 	Avatar,
 	Button,
@@ -14,21 +15,30 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
+	TableSortLabel,
 	Paper
 } from '@mui/material'
 
-const labels = ['Position', 'Name', 'Number']
+const labels = [
+	{ key: 'position', label: 'Position' },
+	{ key: 'name', label: 'Name' },
+	{ key: 'jersey_number', label: 'Number' }
+]
 
 const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 	const [rosterData, setRosterData] = useState([])
+	const [sortConfig, setSortConfig] = useState({
+		key: 'name',
+		descending: false
+	})
 	const { teamAbv } = useParams()
 
 	useEffect(() => {
 		const fetchRosterData = async teamAbv => {
 			try {
-				const response = await fetchTeamRoster(teamAbv)
-				setRosterData(response)
-				console.log(response)
+				const response = await fetchRosterByTeamAbv(teamAbv)
+				const sortedData = quickSortRoster([...response], 'name', false)
+				setRosterData(sortedData)
 			} catch (error) {
 				console.error('Error fetching team roster:', error)
 			}
@@ -36,6 +46,13 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 
 		fetchRosterData(teamAbv)
 	}, [teamAbv])
+
+	const handleSort = key => {
+		const isDescending = sortConfig.key === key ? !sortConfig.descending : false
+		const sortedRoster = quickSortRoster([...rosterData], key, isDescending)
+		setRosterData(sortedRoster)
+		setSortConfig({ key, descending: isDescending })
+	}
 
 	return (
 		<>
@@ -53,9 +70,15 @@ const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
 					<Table sx={{ minWidth: 'sm' }}>
 						<TableHead>
 							<TableRow>
-								{labels.map(label => (
-									<TableCell key={label} align='center'>
-										{label}
+								{labels.map(({ key, label }) => (
+									<TableCell key={key} align='center'>
+										<TableSortLabel
+											active={sortConfig.key === key}
+											direction={sortConfig.descending ? 'desc' : 'asc'}
+											onClick={() => handleSort(key)}
+										>
+											{label}
+										</TableSortLabel>
 									</TableCell>
 								))}
 							</TableRow>
