@@ -1,79 +1,63 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { CircularProgress, Container, Box, Paper, Grid } from '@mui/material'
-import axios from 'axios'
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import Loading from "./Loading";
 
 const Teams = () => {
-	const [teamsData, setTeamsData] = useState([])
+  const [teamsData, setTeamsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-	useEffect(() => {
-		const fetchTeamsData = async () => {
-			const options = {
-				params: {
-					teamStats: 'true',
-					topPerformers: 'true'
-				},
-				headers: {
-					'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-					'X-RapidAPI-Host': import.meta.env.VITE_API_HOST
-				}
-			}
+  useEffect(() => {
+    const fetchTeamsData = async () => {
+      const options = {
+        params: {
+          teamStats: "true",
+          topPerformers: "true",
+        },
+        headers: {
+          "X-RapidAPI-Key": import.meta.env.VITE_API_KEY,
+          "X-RapidAPI-Host": import.meta.env.VITE_API_HOST,
+        },
+      };
 
-			const apiUrl = import.meta.env.VITE_API_URL_TEAMS
+      const apiUrl = import.meta.env.VITE_API_URL_TEAMS;
 
-			axios
-				.get(apiUrl, options)
-				.then(response => {
-					const teams = response.data.body
-					setTeamsData(teams)
-				})
-				.catch(err => console.log(err))
-		}
+      axios
+        .get(apiUrl, options)
+        .then((response) => {
+          const teams = response.data.body;
+          setTeamsData(teams);
+          setIsLoading(false);
+        })
+        .catch((err) => console.log(err));
+    };
 
-		fetchTeamsData()
-	}, [])
+    fetchTeamsData();
+  }, []);
 
-	return (
-		<Container maxWidth='lg'>
-			<Grid container spacing={4} mx='auto'>
-				{!teamsData.length ? (
-					<Box mx='auto'>
-						<CircularProgress />
-					</Box>
-				) : (
-					teamsData.map(team => (
-						<Grid item xs={6} sm={2} key={team.teamID}>
-							<Link to={`/team/${team.teamAbv}`}>
-								<Box
-									p={2}
-									component={Paper}
-									sx={{
-										borderRadius: '50%',
-										display: 'flex',
-										justifyContent: 'center',
-										alignItems: 'center',
-										height: '100px',
-										width: '100px',
-										overflow: 'hidden' // Hide overflow to prevent image stretching
-									}}
-								>
-									<img
-										src={team.mlbLogo1}
-										alt={`${team.teamCity} ${team.teamName}`}
-										style={{
-											maxWidth: '100%',
-											maxHeight: '100%',
-											objectFit: 'cover'
-										}} // Maintain aspect ratio and cover entire box
-									/>
-								</Box>
-							</Link>
-						</Grid>
-					))
-				)}
-			</Grid>
-		</Container>
-	)
-}
+  return (
+    <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      {isLoading && !teamsData.length ? (
+        <div className="flex justify-center col-span-full">
+          <Loading message="Loading teams..." size="lg" />
+        </div>
+      ) : (
+        teamsData.map((team) => (
+          <div key={team.teamID} className="flex justify-center">
+            <Link to={`/team/${team.teamAbv}`}>
+              <div className="flex items-center justify-center w-24 h-24 p-2 overflow-hidden transition-transform duration-200 bg-white rounded-lg shadow hover:scale-105">
+                <img
+                  src={team.mlbLogo1}
+                  alt={`${team.teamCity} ${team.teamName}`}
+                  className="object-contain max-w-full max-h-full"
+                />
+              </div>
+            </Link>
+          </div>
+        ))
+      )}
+    </div>
+  );
+};
 
-export default Teams
+export default Teams;

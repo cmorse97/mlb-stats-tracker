@@ -1,27 +1,19 @@
-import Teams from '../components/Teams'
-import Navbar from '../components/Navbar'
-import { Box, Container, Typography } from '@mui/material'
+import Teams from "../components/Teams";
+import Navbar from "../components/Navbar";
 
 const Root = () => {
-	return (
-		<>
-			{/* Implement responsive layout */}
-			<Navbar />
-			<Container maxWidth='lg'>
-				<Box
-					display='flex'
-					flexDirection='column'
-					alignItems='center'
-					justifyContent='center'
-					gap={8}
-					my={4}
-				>
-					<Typography variant='h5'>Pick a team to view roster</Typography>
-					<Teams />
-				</Box>
-			</Container>
-		</>
-	)
-}
+  return (
+    <>
+      {/* Implement responsive layout */}
+      <Navbar />
+      <div className="min-w-5xl">
+        <div className="flex flex-col items-center justify-center gap-12 my-4">
+          <h1 className="text-4xl text-gray-700">Pick a team to view roster</h1>
+          <Teams />
+        </div>
+      </div>
+    </>
+  );
+};
 
-export default Root
+export default Root;
