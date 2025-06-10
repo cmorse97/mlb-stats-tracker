@@ -1,18 +1,9 @@
-import { Box, Typography } from '@mui/material'
-
 const Top100 = () => {
-	return (
-		<Box
-			sx={{
-				minHeight: '100vh',
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center'
-			}}
-		>
-			<Typography variant='h2'>Coming Soon...</Typography>
-		</Box>
-	)
-}
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <h2 className="text-4xl font-semibold">Coming Soon...</h2>
+    </div>
+  );
+};
 
-export default Top100
+export default Top100;

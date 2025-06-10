@@ -1,116 +1,95 @@
-import {
-	Box,
-	Typography,
-	TableContainer,
-	Table,
-	TableRow,
-	TableBody,
-	TableHead,
-	TableCell
-} from '@mui/material'
-import PropTypes from 'prop-types'
-
-import PlayerInfo from './PlayerInfo'
+import PropTypes from "prop-types";
+import PlayerInfo from "./PlayerInfo";
 
 const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
-	const playerData = setPlayerData
-	const isPlayerPitcher = playerData.position === 'P'
-	const heading = isPlayerPitcher ? 'Pitching Stats' : 'Hitting Stats'
+  const playerData = setPlayerData;
+  const isPlayerPitcher = playerData.position === "P";
+  const heading = isPlayerPitcher ? "Pitching Stats" : "Hitting Stats";
 
-	const statKeyMap = {
-		InningsPitched: 'IP',
-		'Wild Pitch': 'WP',
-		Win: 'W',
-		Loss: 'L',
-		Save: 'SV',
-		BlownSave: 'BS',
-		CompleteGame: 'CG',
-		ShutOut: 'SHO'
-	}
+  const statKeyMap = {
+    InningsPitched: "IP",
+    "Wild Pitch": "WP",
+    Win: "W",
+    Loss: "L",
+    Save: "SV",
+    BlownSave: "BS",
+    CompleteGame: "CG",
+    ShutOut: "SHO",
+  };
 
-	const hiddenKeys = [
-		'PerfectGame',
-		'Flyouts',
-		'Pitches',
-		'NoHitter',
-		'Strikes',
-		'Groundouts',
-		'Batters Faced'
-	]
+  const hiddenKeys = [
+    "PerfectGame",
+    "Flyouts",
+    "Pitches",
+    "NoHitter",
+    "Strikes",
+    "Groundouts",
+    "Batters Faced",
+  ];
 
-	const statData = isPlayerPitcher
-		? playerData.stats?.Pitching || {}
-		: playerData.stats?.Hitting || {}
+  const statData = isPlayerPitcher
+    ? playerData.stats?.Pitching || {}
+    : playerData.stats?.Hitting || {};
 
-	const statEntries = Object.entries(statData).filter(
-		([key]) => !hiddenKeys.includes(key)
-	)
+  const statEntries = Object.entries(statData).filter(
+    ([key]) => !hiddenKeys.includes(key)
+  );
 
-	const style = {
-		position: 'absolute',
-		top: '50%',
-		left: '50%',
-		transform: 'translate(-50%, -50%)',
-		width: '80%',
-		bgcolor: 'background.paper',
-		borderRadius: '24px',
-		boxShadow: 24,
-		p: 4
-	}
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md">
+      <div className="relative w-11/12 max-w-5xl p-6 bg-white drop-shadow-2xl rounded-2xl">
+        <PlayerInfo
+          playerData={playerData}
+          handlePlayerModalClose={handlePlayerModalClose}
+        />
 
-	return (
-		<Box sx={style}>
-			<PlayerInfo
-				playerData={playerData}
-				handlePlayerModalClose={handlePlayerModalClose}
-			/>
-			<Box p={4} sx={{ border: '1px solid grey', borderRadius: '12px' }}>
-				{!statEntries.length ? (
-					<Typography>No stats available</Typography>
-				) : (
-					<TableContainer>
-						<Table>
-							<TableHead>
-								<TableRow>
-									<TableCell colSpan={statEntries.length}>
-										<Typography sx={{ fontWeight: 'bold' }}>
-											{heading}
-										</Typography>
-									</TableCell>
-								</TableRow>
-								<TableRow>
-									{statEntries.map(([key]) => (
-										<TableCell
-											key={key}
-											sx={{
-												fontWeight: 'bold',
-												textAlign: 'center',
-												textTransform: 'uppercase'
-											}}
-										>
-											{statKeyMap[key] || key}
-										</TableCell>
-									))}
-								</TableRow>
-							</TableHead>
-							<TableBody>
-								<TableRow>
-									{statEntries.map(([_, value], index) => (
-										<TableCell key={index}>{value}</TableCell>
-									))}
-								</TableRow>
-							</TableBody>
-						</Table>
-					</TableContainer>
-				)}
-			</Box>
-		</Box>
-	)
-}
+        <div className="p-4 mt-6 border border-gray-300 rounded-xl">
+          {!statEntries.length ? (
+            <p className="text-center text-gray-500">No stats available</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-center border-collapse table-auto">
+                <thead>
+                  <tr>
+                    <th
+                      colSpan={statEntries.length}
+                      className="pb-2 text-lg font-semibold text-gray-800"
+                    >
+                      {heading}
+                    </th>
+                  </tr>
+                  <tr>
+                    {statEntries.map(([key]) => (
+                      <th
+                        key={key}
+                        className="px-2 py-1 text-xs font-bold text-gray-600 uppercase"
+                      >
+                        {statKeyMap[key] || key}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    {statEntries.map(([_, value], index) => (
+                      <td key={index} className="px-2 py-1 text-sm">
+                        {value}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 PlayerModal.propTypes = {
-	setPlayerData: PropTypes.object.isRequired,
-	handlePlayerModalClose: PropTypes.func.isRequired
-}
+  setPlayerData: PropTypes.object.isRequired,
+  handlePlayerModalClose: PropTypes.func.isRequired,
+};
 
-export default PlayerModal
+export default PlayerModal;

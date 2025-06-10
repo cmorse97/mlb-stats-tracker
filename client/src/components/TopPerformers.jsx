@@ -1,47 +1,49 @@
-import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { fetchRosterByTeamAbv } from '../services/api'
-import {
-	Box,
-	// Grid,
-	// Avatar,
-	// Divider,
-	Typography,
-	// Card,
-	// CardContent,
-	CircularProgress
-} from '@mui/material'
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { fetchTopPerformers } from "../services/api";
+import PerformerCard from "./PerformerCard";
 
 const TopPerformers = () => {
-	const [rosterData, setRosterData] = useState([])
-	const { teamAbv } = useParams()
+  const [data, setData] = useState(null);
+  const { teamAbv } = useParams();
 
-	useEffect(() => {
-		const fetchRosterData = async teamAbv => {
-			try {
-				const response = await fetchRosterByTeamAbv(teamAbv)
-				setRosterData(response)
-			} catch (error) {
-				console.error('Error fetching team roster:', error)
-			}
-		}
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetchTopPerformers(teamAbv);
+        setData(response);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadData();
+  }, [teamAbv]);
 
-		fetchRosterData(teamAbv)
-	}, [teamAbv])
+  if (!data) return <div className="mt-12 text-center">Loading...</div>;
 
-	return (
-		<Box mx='auto' marginY={8}>
-			{!rosterData ? (
-				<Box display='flex' justifyContent='center' alignItems='center'>
-					<CircularProgress />
-				</Box>
-			) : (
-				<Box>
-					<Typography variant='h4'>Top Performers</Typography>
-				</Box>
-			)}
-		</Box>
-	)
-}
+  return (
+    <div className="my-12">
+      <h2 className="mb-6 text-3xl font-bold text-center">Top Performers</h2>
+      <div className="flex flex-col gap-6">
+        <div>
+          <h3 className="mb-2 text-xl font-semibold">Hitting</h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {data.hitters.map((player) => (
+              <PerformerCard key={player.player_id} {...player} />
+            ))}
+          </div>
+        </div>
+        <div>
+          <h3 className="mb-2 text-xl font-semibold">Pitching</h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {data.pitchers.map((player) => (
+              <PerformerCard key={player.player_id} {...player} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-export default TopPerformers
+export default TopPerformers;
