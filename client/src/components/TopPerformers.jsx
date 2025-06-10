@@ -28,16 +28,16 @@ const TopPerformers = () => {
         <div>
           <h3 className="mb-2 text-xl font-semibold">Hitting</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {data.hitters.map((player) => (
-              <PerformerCard key={player.player_id} {...player} />
+            {data.hitters.map((player, index) => (
+              <PerformerCard key={index} {...player} />
             ))}
           </div>
         </div>
         <div>
           <h3 className="mb-2 text-xl font-semibold">Pitching</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {data.pitchers.map((player) => (
-              <PerformerCard key={player.player_id} {...player} />
+            {data.pitchers.map((player, index) => (
+              <PerformerCard key={index} {...player} />
             ))}
           </div>
         </div>

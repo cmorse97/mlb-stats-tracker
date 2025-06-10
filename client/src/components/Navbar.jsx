@@ -18,10 +18,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="text-white bg-blue-900 shadow-md">
+    <nav className="sticky top-0 text-white bg-blue-900 shadow-md">
       <div className="container flex items-center justify-between px-4 py-3 mx-auto">
         {/* Logo / Title */}
-        <Link to="/" className="flex items-center gap-2 text-white">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-white transition-all duration-300 ease-in-out hover:text-blue-300 hover:scale-105"
+        >
           <MdMultilineChart className="text-2xl" />
           <span className="text-xl font-bold">MLB Stats Tracker</span>
         </Link>
@@ -32,7 +35,7 @@ const Navbar = () => {
             <Link
               key={page.name}
               to={`/${page.path}`}
-              className="transition duration-200 hover:text-blue-300"
+              className="transition duration-300 ease-in-out hover:text-blue-300 hover:scale-105"
             >
               {page.name}
             </Link>

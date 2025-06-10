@@ -28,11 +28,27 @@ app.use("/api/players/:playerId", playersRoute); // Get single player by id
 
 // Test route
 app.get("/", (req, res) => {
-  res.send("MLB Stats Tracker backend is running!");
+  res.status(200).json({
+    statusCode: 200,
+    message: "Welcome to the MLB Stats Tracker API",
+    body: {
+      description:
+        "This API provides access to MLB team and player statistics.",
+      endpoints: [
+        { method: "POST", path: "/api/data" },
+        { method: "GET", path: "/api/teams" },
+        { method: "GET", path: "/api/teams/:teamAbv" },
+        { method: "GET", path: "/api/teams/:teamAbv/roster" },
+        { method: "GET", path: "/api/teams/:teamAbv/top-performers" },
+        { method: "GET", path: "/api/players" },
+        { method: "GET", path: "/api/players/:playerId" },
+      ],
+    },
+  });
 });
 
 // Cron job
-// import cron from './utils/cronJob.js'
+import cron from "./utils/cronJob.js";
 
 // Start server
 app.listen(PORT, () => {
