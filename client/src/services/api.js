@@ -50,3 +50,15 @@ export const fetchTopPerformers = async (teamAbv) => {
     return null;
   }
 };
+
+// Get standings from backend API
+export const fetchStandings = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/teams/standings`);
+    const standings = await response.data.body;
+    return standings;
+  } catch (error) {
+    console.error("Error fetching standings:", error);
+    return null;
+  }
+};

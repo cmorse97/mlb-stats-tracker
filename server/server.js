@@ -23,6 +23,7 @@ app.use("/api/teams", teamsRoutes); // Get all teams
 app.use("/api/teams/:teamAbv", teamsRoutes); // Get single team
 app.use("/api/teams/:teamAbv/roster", teamsRoutes); // Get players from a team's roster
 app.use("/api/teams/:teamAbv/top-performers", teamsRoutes); // Get top performers from a team's roster
+app.use("/api/teams/standings", teamsRoutes); // Get standings
 app.use("/api/players", playersRoute); // Get all players
 app.use("/api/players/:playerId", playersRoute); // Get single player by id
 
@@ -40,15 +41,13 @@ app.get("/", (req, res) => {
         { method: "GET", path: "/api/teams/:teamAbv" },
         { method: "GET", path: "/api/teams/:teamAbv/roster" },
         { method: "GET", path: "/api/teams/:teamAbv/top-performers" },
+        { method: "GET", path: "/api/teams/standings" },
         { method: "GET", path: "/api/players" },
         { method: "GET", path: "/api/players/:playerId" },
       ],
     },
   });
 });
-
-// Cron job
-import cron from "./utils/cronJob.js";
 
 // Start server
 app.listen(PORT, () => {

@@ -1,5 +1,6 @@
 import supabase from "../utils/supabaseClient.js";
 import { getTopPerformersByTeamAbv } from "../services/topPerformersService.js";
+import { getTeamStandings } from "../services/standingService.js";
 
 export const getAllTeams = async (req, res) => {
   try {
@@ -86,6 +87,23 @@ export const getTopPerformers = async (req, res) => {
     console.error(`Error fetching top performers for ${teamAbv}:`, err);
     res.status(500).json({
       message: `Failed to fetch top performers for ${teamAbv}`,
+      error: err.message,
+    });
+  }
+};
+
+export const getTeamStandingsController = async (req, res) => {
+  try {
+    const standings = await getTeamStandings();
+    res.status(200).json({
+      statusCode: 200,
+      message: "Team standings fetched successfully",
+      body: standings,
+    });
+  } catch (err) {
+    console.error("Error fetching team standings:", err);
+    res.status(500).json({
+      message: "Failed to fetch team standings",
       error: err.message,
     });
   }

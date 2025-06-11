@@ -8,7 +8,7 @@ import { fetchTeams, storeTeamsInSupabase } from "../models/teamModel.js";
 export const updatePlayers = () => {
   try {
     cron.schedule(
-      "0 0 1 * * *", // Update once per hour
+      "* 1 * * *", // Update once per hour
       async () => {
         console.log("Running scheduled job to update players data...");
         const players = await fetchAllPlayers();
@@ -28,7 +28,7 @@ export const updatePlayers = () => {
 export const updateTeams = () => {
   try {
     cron.schedule(
-      "0 0 1 * * *", // Update once per hour
+      "* 1 * * *", // Update once per hour
       async () => {
         console.log("Running scheduled job to update teams data...");
         const teams = await fetchTeams();
