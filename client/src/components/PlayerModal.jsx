@@ -11,6 +11,15 @@ const TEAM_COLORS = {
   TOR: '#134A8E', WSH: '#AB0003',
 }
 
+// MLB numeric team IDs — used to load official team logos from mlbstatic CDN
+const TEAM_IDS = {
+  ARI: 109, ATL: 144, BAL: 110, BOS: 111, CHC: 112, CWS: 145,
+  CIN: 113, CLE: 114, COL: 115, DET: 116, HOU: 117, KC:  118,
+  LAA: 108, LAD: 119, MIA: 146, MIL: 158, MIN: 142, NYM: 121,
+  NYY: 147, ATH: 133, PHI: 143, PIT: 134, SD:  135, SF:  137,
+  SEA: 136, STL: 138, TB:  139, TEX: 140, TOR: 141, WSH: 120,
+}
+
 const HITTER_STATS = [
   ['gamesPlayed', 'G'],  ['atBats', 'AB'],   ['hits', 'H'],
   ['homeRuns', 'HR'],    ['rbi', 'RBI'],      ['baseOnBalls', 'BB'],
@@ -72,7 +81,7 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
     >
       {/* Card */}
       <div
-        className='relative w-80 rounded-2xl overflow-hidden shadow-2xl select-none'
+        className='relative w-80 lg:w-96 rounded-2xl overflow-hidden shadow-2xl select-none'
         onClick={e => e.stopPropagation()}
       >
         {/* ── Header band ── */}
@@ -81,6 +90,15 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
           <div className='absolute inset-0 opacity-10'
             style={{ backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)', backgroundSize: '8px 8px' }}
           />
+          {/* team logo watermark */}
+          {TEAM_IDS[team_abv] && (
+            <img
+              src={`https://www.mlbstatic.com/team-logos/${TEAM_IDS[team_abv]}.svg`}
+              alt=''
+              aria-hidden='true'
+              className='absolute inset-0 w-full h-full object-contain opacity-[0.12] scale-110 pointer-events-none'
+            />
+          )}
           <button
             onClick={handlePlayerModalClose}
             className='absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition text-xs font-bold'
@@ -137,31 +155,33 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
             {bats   && <span><b className='text-gray-700'>B/T</b> {bats}/{playerThrows}</span>}
           </div>
 
-          {/* Stats */}
-          {statSource ? (
-            <div className='rounded-xl overflow-hidden border border-gray-100'>
-              <div
-                className='py-1.5 text-center text-[11px] font-bold tracking-widest uppercase text-white'
-                style={{ backgroundColor: teamColor }}
-              >
-                {isPitcher ? 'Pitching' : 'Hitting'} Stats
-              </div>
-              <div className='grid grid-cols-6 gap-y-3 px-2 py-3 bg-gray-50'>
-                {row1.map(([key, label]) => (
-                  <StatCell key={key} label={label} value={statSource[key]} />
-                ))}
-              </div>
-              <div className='grid grid-cols-6 gap-y-3 px-2 pb-3 bg-gray-50 border-t border-gray-100'>
-                {row2.map(([key, label]) => (
-                  <StatCell key={key} label={label} value={statSource[key]} />
-                ))}
-              </div>
+          {/* Stats — fixed height keeps all cards uniform */}
+          <div className='rounded-xl overflow-hidden border border-gray-100 min-h-[116px]'>
+            <div
+              className='py-1.5 text-center text-[11px] font-bold tracking-widest uppercase text-white'
+              style={{ backgroundColor: teamColor }}
+            >
+              {isPitcher ? 'Pitching' : 'Hitting'} Stats
             </div>
-          ) : (
-            <p className='text-center text-xs text-gray-400 py-4 italic'>
-              No stats available yet
-            </p>
-          )}
+            {statSource ? (
+              <>
+                <div className='grid grid-cols-6 gap-y-3 px-2 py-3 bg-gray-50'>
+                  {row1.map(([key, label]) => (
+                    <StatCell key={key} label={label} value={statSource[key]} />
+                  ))}
+                </div>
+                <div className='grid grid-cols-6 gap-y-3 px-2 pb-3 bg-gray-50 border-t border-gray-100'>
+                  {row2.map(([key, label]) => (
+                    <StatCell key={key} label={label} value={statSource[key]} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className='flex items-center justify-center h-[90px] bg-gray-50'>
+                <p className='text-xs text-gray-400 italic'>No stats available yet</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
