@@ -1,102 +1,112 @@
 import supabase from '../utils/supabaseClient.js'
 import axios from 'axios'
-import { fetchTeams } from './teamModel.js'
-import addCalculatedStats from '../utils/statCalculations.js'
 
-const API_URL_ROSTERS = process.env.API_URL_ROSTERS
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY
-const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST
+const MLB_API = process.env.MLB_API_URL || 'https://statsapi.mlb.com/api/v1'
+const SEASON = new Date().getFullYear()
 
-// Fetch all players from all teams
-export const fetchAllPlayers = async () => {
-	console.log('Fetching all players...')
-	const teams = await fetchTeams()
-
-	let allPlayers = []
-
-	for (const team of teams) {
-		const teamAbv = team.teamAbv
-		const playersByTeam = await fetchPlayersByTeam(teamAbv)
-		if (playersByTeam && Array.isArray(playersByTeam)) {
-			const enrichedPlayers = playersByTeam.map(player => {
-				const calculated = addCalculatedStats(player)
-				return { ...calculated, teamAbv }
-			})
-			allPlayers.push(...enrichedPlayers)
-		}
-	}
-
-	return allPlayers
-}
-
-// Fetch players by team
-export const fetchPlayersByTeam = async teamAbv => {
-	console.log('Fetching players for team:', teamAbv)
-	const options = {
-		method: 'GET',
-		url: API_URL_ROSTERS,
-		params: {
-			teamAbv: teamAbv,
-			getStats: 'true'
-		},
-		headers: {
-			'x-rapidapi-key': RAPIDAPI_KEY,
-			'x-rapidapi-host': RAPIDAPI_HOST
-		}
-	}
-
+// Fetch active roster for a single team, with player details hydrated
+const fetchRosterByTeamId = async (teamId, teamAbv) => {
 	try {
-		const response = await axios.request(options)
-		return response.data.body.roster
+		const res = await axios.get(`${MLB_API}/teams/${teamId}/roster`, {
+			params: {
+				rosterType: 'active',
+				season: SEASON,
+				hydrate: 'person(birthDate,height,weight,batSide,pitchHand)'
+			}
+		})
+		return (res.data.roster || []).map(entry => ({
+			...entry,
+			_teamId: teamId,
+			_teamAbv: teamAbv
+		}))
 	} catch (err) {
-		console.error('Error fetching players:', err)
+		console.error(`Error fetching roster for team ${teamAbv}:`, err.message)
 		return []
 	}
 }
 
-// Format players for Supabase
-export const formatPlayers = players => {
-	return players.map(player => {
-		if (player.stats) {
-			player = addCalculatedStats(player)
+// Fetch season stats for all players in a given group (hitting or pitching)
+// Returns a map of { [playerId]: statObject }
+const fetchBatchStats = async group => {
+	console.log(`Fetching all ${group} stats from MLB API...`)
+	const res = await axios.get(`${MLB_API}/stats`, {
+		params: {
+			stats: 'season',
+			group,
+			season: SEASON,
+			playerPool: 'All',
+			sportId: 1,
+			limit: 2000
 		}
+	})
 
+	const statsMap = {}
+	const splits = res.data.stats?.[0]?.splits || []
+	for (const split of splits) {
+		const playerId = split.player?.id
+		if (playerId) statsMap[playerId] = split.stat
+	}
+	return statsMap
+}
+
+// Fetch all active players across all 30 MLB teams
+export const fetchAllPlayers = async () => {
+	console.log('Fetching all players...')
+
+	// Get all active MLB teams to build teamId → teamAbv mapping
+	const teamsRes = await axios.get(`${MLB_API}/teams`, {
+		params: { sportId: 1, season: SEASON }
+	})
+	const teams = teamsRes.data.teams.filter(t => t.active && t.sport?.id === 1)
+
+	// Fetch all 30 rosters + hitting/pitching stats in parallel
+	const [rosterEntries, hittingStats, pitchingStats] = await Promise.all([
+		Promise.all(
+			teams.map(t => fetchRosterByTeamId(t.id, t.abbreviation))
+		).then(rosters => rosters.flat()),
+		fetchBatchStats('hitting'),
+		fetchBatchStats('pitching')
+	])
+
+	// Merge roster data with stats by player ID
+	return rosterEntries.map(entry => {
+		const person = entry.person
+		const playerId = person.id
 		return {
-			player_id: player.playerID,
-			name: player.longName,
-			position: player.pos,
-			team_id: player.teamID,
-			bday: player.bDay,
-			jersey_number: player.jerseyNum,
-			bats: player.bat,
-			height: player.height,
-			avatar: player.mlbHeadshot,
-			throws: player.throw,
-			weight: player.weight,
-			team_abv: player.teamAbv, // included from enriched step
-			stats: player.stats || null // store as JSON object (jsonb in Supabase)
+			player_id: playerId,
+			name: person.fullName,
+			position: entry.position?.abbreviation ?? null,
+			team_id: entry._teamId,
+			team_abv: entry._teamAbv,
+			bday: person.birthDate ?? null,
+			jersey_number: entry.jerseyNumber ?? null,
+			bats: person.batSide?.code ?? null,
+			throws: person.pitchHand?.code ?? null,
+			height: person.height ?? null,
+			weight: person.weight ? String(person.weight) : null,
+			avatar: `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${playerId}/headshot/67/current`,
+			stats: {
+				Hitting: hittingStats[playerId] ?? null,
+				Pitching: pitchingStats[playerId] ?? null
+			}
 		}
 	})
 }
 
 // Store players in Supabase
 export const storePlayersInSupabase = async players => {
-	const formattedPlayers = formatPlayers(players)
-
-	if (!formattedPlayers.length) {
+	if (!players?.length) {
 		console.error('No players to store')
 		return
 	}
 
 	const { data, error } = await supabase
 		.from('players')
-		.upsert(formattedPlayers, {
-			onConflict: ['player_id']
-		})
+		.upsert(players, { onConflict: ['player_id'] })
 		.select()
 
 	if (error) {
-		console.error('Error storing players data in Supabase:', error.message)
+		console.error('Error storing players:', error.message)
 		throw error
 	}
 	return data

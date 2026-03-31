@@ -1,77 +1,66 @@
 import supabase from '../utils/supabaseClient.js'
 import axios from 'axios'
 
-const API_URL_TEAMS = process.env.API_URL_TEAMS
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY
-const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST
+const MLB_API = process.env.MLB_API_URL || 'https://statsapi.mlb.com/api/v1'
+const SEASON = new Date().getFullYear()
 
-// Fetch all teams
+// Fetch all teams with standings data from MLB API
 export const fetchTeams = async () => {
-	console.log('fetching teams...')
-	const options = {
-		method: 'GET',
-		url: API_URL_TEAMS,
-		params: {
-			teamStats: 'true',
-			topPerformers: 'true',
-			rosters: 'true'
-		},
-		headers: {
-			'x-rapidapi-key': RAPIDAPI_KEY,
-			'x-rapidapi-host': RAPIDAPI_HOST
+	console.log('Fetching teams from MLB API...')
+
+	const [teamsRes, standingsRes] = await Promise.all([
+		axios.get(`${MLB_API}/teams`, {
+			params: { sportId: 1, season: SEASON }
+		}),
+		axios.get(`${MLB_API}/standings`, {
+			params: { leagueId: '103,104', season: SEASON }
+		})
+	])
+
+	// Build standings lookup keyed by MLB team ID
+	const standingsMap = {}
+	for (const division of standingsRes.data.records) {
+		for (const record of division.teamRecords) {
+			standingsMap[record.team.id] = {
+				wins: record.wins,
+				losses: record.losses,
+				runsScored: record.runsScored ?? 0,
+				runsAllowed: record.runsAllowed ?? 0,
+				runDiff: record.runDifferential ?? 0
+			}
 		}
 	}
-	try {
-		const response = await axios.request(options)
-		if (!response || !response.data || !response.data.body) {
-			console.error('Error fetching teams:', 'No teams data retrieved from API')
-			throw new Error('No teams data retrieved from API')
-		}
 
-		const teams = response.data.body
-		return teams // Returns teams array of objects
-	} catch (err) {
-		console.error('Error fetching teams:', err.message)
-		throw err
-	}
-}
+	const teams = teamsRes.data.teams.filter(t => t.active && t.sport?.id === 1)
 
-// Format teams for supabase
-const formatTeams = teams => {
 	return teams.map(team => ({
+		mlb_id: team.id,
 		name: team.teamName,
-		city: team.teamCity,
-		team_abv: team.teamAbv,
-		league: team.conference,
-		league_abv: team.conferenceAbv,
-		division: team.division,
-		logo: team.mlbLogo1,
-		wins: team.wins,
-		losses: team.loss,
-		runs_scored: team.RS,
-		runs_allowed: team.RA,
-		run_diff: team.DIFF
+		city: team.locationName,
+		team_abv: team.abbreviation,
+		league: team.league?.name ?? null,
+		league_abv: team.league?.id === 103 ? 'AL' : 'NL',
+		division: team.division?.name ?? null,
+		logo: `https://www.mlbstatic.com/team-logos/${team.id}.svg`,
+		wins: standingsMap[team.id]?.wins ?? 0,
+		losses: standingsMap[team.id]?.losses ?? 0,
+		runs_scored: standingsMap[team.id]?.runsScored ?? 0,
+		runs_allowed: standingsMap[team.id]?.runsAllowed ?? 0,
+		run_diff: standingsMap[team.id]?.runDiff ?? 0
 	}))
 }
 
 // Store teams in Supabase
 export const storeTeamsInSupabase = async teams => {
-	const formattedTeams = formatTeams(teams)
-
-	if (!formattedTeams) {
-		console.error('Error formatting teams:', 'No teams data to format')
-		throw new Error('No teams data to format')
-	}
+	if (!teams?.length) throw new Error('No teams to store')
 
 	const { data, error } = await supabase
 		.from('teams')
-		.upsert(formattedTeams, {
-			onConflict: ['team_abv']
-		})
+		.upsert(teams, { onConflict: ['team_abv'] })
 		.select()
 
 	if (error) {
-		console.error('Error storing teams data in Supabase:', error.message)
+		console.error('Error storing teams:', error.message)
 		throw error
 	}
 	return data
