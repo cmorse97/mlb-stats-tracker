@@ -1,4 +1,4 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
 const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
   if (!playerData) return null;
@@ -13,8 +13,20 @@ const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
     height,
     weight,
     bday,
-    throws: playerThrows, // renamed to avoid using reserved word "throws"
+    throws: playerThrows, // renamed to avoid using reserved word "throws",
   } = playerData;
+
+  const calculateAge = bday => {
+    if (!bday) return null
+    const birth = new Date(bday)
+    const today = new Date()
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--
+    return age
+  }
+
+  const age = calculateAge(bday)
 
   return (
     <div className="relative flex flex-col gap-12 p-8 md:flex-row">
@@ -39,21 +51,25 @@ const PlayerInfo = ({ playerData, handlePlayerModalClose }) => {
       {/* Player Details */}
       <div className="flex flex-col justify-center space-y-2 text-sm text-gray-700">
         <p>
-          <span className="font-semibold">Position:</span> {position}{" "}
+          <span className="font-semibold">Position:</span> {position}{' '}
           <span className="font-semibold">Number:</span> {jersey_number}
         </p>
         <p>
           <span className="font-semibold">Team:</span> {team_abv}
         </p>
         <p>
-          <span className="font-semibold">Bats:</span> {bats}{" "}
+          <span className="font-semibold">Bats:</span> {bats}{' '}
           <span className="font-semibold">Throws:</span> {playerThrows}
         </p>
         <p>
-          {height}, {weight} lbs.
+          <span className="font-semibold">Height: </span>
+          {height} <span className="font-semibold">Weight: </span>
+          {weight} lbs.
         </p>
         <p>
-          <span className="font-semibold">Born:</span> {bday}
+          <span className="font-semibold">Born:</span> {bday}{' '}
+          <span className="font-semibold">Age: </span>
+          {age ?? 'N/A'}
         </p>
       </div>
     </div>
