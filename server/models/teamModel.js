@@ -36,7 +36,7 @@ export const fetchTeams = async () => {
 	return teams.map(team => ({
 		mlb_id: team.id,
 		name: team.teamName,
-		city: team.locationName,
+		city: team.franchiseName,
 		team_abv: team.abbreviation,
 		league: team.league?.name ?? null,
 		league_abv: team.league?.id === 103 ? 'AL' : 'NL',
