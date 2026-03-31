@@ -97,7 +97,7 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
               alt=''
               aria-hidden='true'
               className='absolute inset-0 w-full h-full object-contain opacity-20 scale-110 pointer-events-none'
-              style={{ filter: 'brightness(0) invert(1)' }}
+              style={{ filter: 'grayscale(1)' }}
             />
           )}
           <button
