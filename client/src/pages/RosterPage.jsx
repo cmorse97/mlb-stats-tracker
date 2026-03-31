@@ -21,20 +21,10 @@ const RosterPage = () => {
       />
 
       {playerModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
-          onClick={handlePlayerModalClose}
-        >
-          <div
-            className="w-full max-w-3xl p-6 bg-white rounded-lg shadow-lg"
-            onClick={(e) => e.stopPropagation()} // prevent closing modal when clicking inside
-          >
-            <PlayerModal
-              setPlayerData={playerData}
-              handlePlayerModalClose={handlePlayerModalClose}
-            />
-          </div>
-        </div>
+        <PlayerModal
+          setPlayerData={playerData}
+          handlePlayerModalClose={handlePlayerModalClose}
+        />
       )}
     </div>
   );

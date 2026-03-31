@@ -1,131 +1,176 @@
-import PropTypes from "prop-types";
-import PlayerInfo from "./PlayerInfo";
+import PropTypes from 'prop-types'
+
+const TEAM_COLORS = {
+  ARI: '#A71930', ATL: '#CE1141', BAL: '#DF4601', BOS: '#BD3039',
+  CHC: '#0E3386', CWS: '#27251F', CIN: '#C6011F', CLE: '#E31937',
+  COL: '#33006F', DET: '#0C2340', HOU: '#002D62', KC:  '#004687',
+  LAA: '#BA0021', LAD: '#005A9C', MIA: '#00A3E0', MIL: '#12284B',
+  MIN: '#002B5C', NYM: '#002D72', NYY: '#003087', ATH: '#003831',
+  PHI: '#E81828', PIT: '#27251F', SD:  '#2F241D', SF:  '#FD5A1E',
+  SEA: '#0C2C56', STL: '#C41E3A', TB:  '#092C5C', TEX: '#003278',
+  TOR: '#134A8E', WSH: '#AB0003',
+}
+
+const HITTER_STATS = [
+  ['gamesPlayed', 'G'],  ['atBats', 'AB'],   ['hits', 'H'],
+  ['homeRuns', 'HR'],    ['rbi', 'RBI'],      ['baseOnBalls', 'BB'],
+  ['avg', 'AVG'],        ['obp', 'OBP'],      ['slg', 'SLG'],
+  ['ops', 'OPS'],        ['strikeOuts', 'K'], ['stolenBases', 'SB'],
+]
+
+const PITCHER_STATS = [
+  ['gamesPlayed', 'G'],          ['gamesStarted', 'GS'], ['wins', 'W'],
+  ['losses', 'L'],               ['saves', 'SV'],        ['inningsPitched', 'IP'],
+  ['era', 'ERA'],                ['whip', 'WHIP'],       ['strikeOuts', 'K'],
+  ['baseOnBalls', 'BB'],         ['strikeoutsPer9Inn', 'K/9'], ['walksPer9Inn', 'BB/9'],
+]
+
+const calculateAge = bday => {
+  if (!bday) return null
+  const birth = new Date(bday)
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--
+  return age
+}
+
+const StatCell = ({ label, value }) => (
+  <div className='flex flex-col items-center gap-0.5'>
+    <span className='text-[10px] font-bold tracking-wider text-gray-400 uppercase'>
+      {label}
+    </span>
+    <span className='text-sm font-semibold text-gray-800'>
+      {value ?? '—'}
+    </span>
+  </div>
+)
 
 const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
-  const playerData = setPlayerData;
-  const isPlayerPitcher = playerData.position === "P";
-  const heading = isPlayerPitcher ? "Pitching Stats" : "Hitting Stats";
+  const playerData = setPlayerData
+  const {
+    name, avatar, position, jersey_number, team_abv,
+    bats, throws: playerThrows, height, weight, bday,
+  } = playerData
 
-  const statKeyMap = {
-    // Hitting
-    gamesPlayed: "G",
-    atBats: "AB",
-    runs: "R",
-    hits: "H",
-    doubles: "2B",
-    triples: "3B",
-    homeRuns: "HR",
-    rbi: "RBI",
-    baseOnBalls: "BB",
-    intentionalWalks: "IBB",
-    strikeOuts: "K",
-    stolenBases: "SB",
-    caughtStealing: "CS",
-    hitByPitch: "HBP",
-    sacBunts: "SAC",
-    sacFlies: "SF",
-    groundIntoDoublePlay: "GIDP",
-    totalBases: "TB",
-    avg: "AVG",
-    obp: "OBP",
-    slg: "SLG",
-    ops: "OPS",
-    plateAppearances: "PA",
-    babip: "BABIP",
-    // Pitching
-    wins: "W",
-    losses: "L",
-    era: "ERA",
-    inningsPitched: "IP",
-    earnedRuns: "ER",
-    whip: "WHIP",
-    saves: "SV",
-    saveOpportunities: "SVO",
-    blownSaves: "BS",
-    completeGames: "CG",
-    shutouts: "SHO",
-    battersFaced: "BF",
-    strikeoutsPer9Inn: "K/9",
-    walksPer9Inn: "BB/9",
-    strikeoutWalkRatio: "K/BB",
-  };
+  const isPitcher = position === 'P'
+  const teamColor = TEAM_COLORS[team_abv] || '#1e293b'
+  const statSource = isPitcher
+    ? playerData.stats?.Pitching
+    : playerData.stats?.Hitting
+  const statDefs = isPitcher ? PITCHER_STATS : HITTER_STATS
+  const age = calculateAge(bday)
+  const year = new Date().getFullYear()
 
-  const hiddenKeys = [
-    "age",
-    "airOuts",
-    "groundOuts",
-    "numberOfPitches",
-    "leftOnBase",
-    "atBatsPerHomeRun",
-    "groundOutsToAirouts",
-    "catchersInterference",
-    "stolenBasePercentage",
-    "caughtStealingPercentage",
-  ];
-
-  const statData = isPlayerPitcher
-    ? playerData.stats?.Pitching || {}
-    : playerData.stats?.Hitting || {};
-
-  const statEntries = Object.entries(statData).filter(
-    ([key]) => !hiddenKeys.includes(key)
-  );
+  const row1 = statDefs.slice(0, 6)
+  const row2 = statDefs.slice(6)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md">
-      <div className="relative w-11/12 max-w-5xl p-6 bg-white drop-shadow-2xl rounded-2xl">
-        <PlayerInfo
-          playerData={playerData}
-          handlePlayerModalClose={handlePlayerModalClose}
-        />
+    <div
+      className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm'
+      onClick={handlePlayerModalClose}
+    >
+      {/* Card */}
+      <div
+        className='relative w-80 rounded-2xl overflow-hidden shadow-2xl select-none'
+        onClick={e => e.stopPropagation()}
+      >
+        {/* ── Header band ── */}
+        <div className='relative h-28' style={{ backgroundColor: teamColor }}>
+          {/* subtle diagonal texture */}
+          <div className='absolute inset-0 opacity-10'
+            style={{ backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)', backgroundSize: '8px 8px' }}
+          />
+          <button
+            onClick={handlePlayerModalClose}
+            className='absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition text-xs font-bold'
+          >
+            ✕
+          </button>
+          <div className='absolute bottom-3 left-4 text-white font-bold text-sm tracking-widest uppercase'>
+            {team_abv}
+          </div>
+          <div className='absolute bottom-3 right-4 text-white/50 text-xs tracking-widest'>
+            {year}
+          </div>
+        </div>
 
-        <div className="p-4 mt-6 border border-gray-300 rounded-xl">
-          {!statEntries.length ? (
-            <p className="text-center text-gray-500">No stats available</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-center border-collapse table-auto">
-                <thead>
-                  <tr>
-                    <th
-                      colSpan={statEntries.length}
-                      className="pb-2 text-lg font-semibold text-gray-800"
-                    >
-                      {heading}
-                    </th>
-                  </tr>
-                  <tr>
-                    {statEntries.map(([key]) => (
-                      <th
-                        key={key}
-                        className="px-2 py-1 text-xs font-bold text-gray-600 uppercase"
-                      >
-                        {statKeyMap[key] || key}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    {statEntries.map(([_, value], index) => (
-                      <td key={index} className="px-2 py-1 text-sm">
-                        {value}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
+        {/* ── Body ── */}
+        <div className='bg-white px-5 pt-14 pb-5 relative'>
+
+          {/* Avatar — overlaps header */}
+          <div className='absolute -top-11 left-1/2 -translate-x-1/2'>
+            <div
+              className='w-[88px] h-[88px] rounded-full overflow-hidden border-4 border-white shadow-xl'
+              style={{ backgroundColor: teamColor + '18' }}
+            >
+              <img
+                src={avatar}
+                alt={name}
+                className='w-full h-full object-cover'
+                onError={e => { e.target.src = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/0/headshot/67/current` }}
+              />
             </div>
+          </div>
+
+          {/* Name + position */}
+          <div className='text-center mb-3'>
+            <h2 className='text-base font-bold text-gray-900 leading-snug'>{name}</h2>
+            <div className='flex items-center justify-center gap-2 mt-1'>
+              <span
+                className='text-[11px] font-bold px-2 py-0.5 rounded-full text-white tracking-wide'
+                style={{ backgroundColor: teamColor }}
+              >
+                {position}
+              </span>
+              <span className='text-[11px] text-gray-400 font-medium'>
+                #{jersey_number}
+              </span>
+            </div>
+          </div>
+
+          {/* Physical details */}
+          <div className='flex justify-center flex-wrap gap-x-3 gap-y-1 text-[11px] text-gray-500 mb-4 pb-3 border-b border-gray-100'>
+            {age   && <span><b className='text-gray-700'>Age</b> {age}</span>}
+            {height && <span><b className='text-gray-700'>Ht</b> {height}</span>}
+            {weight && <span><b className='text-gray-700'>Wt</b> {weight} lbs</span>}
+            {bats   && <span><b className='text-gray-700'>B/T</b> {bats}/{playerThrows}</span>}
+          </div>
+
+          {/* Stats */}
+          {statSource ? (
+            <div className='rounded-xl overflow-hidden border border-gray-100'>
+              <div
+                className='py-1.5 text-center text-[11px] font-bold tracking-widest uppercase text-white'
+                style={{ backgroundColor: teamColor }}
+              >
+                {isPitcher ? 'Pitching' : 'Hitting'} Stats
+              </div>
+              <div className='grid grid-cols-6 gap-y-3 px-2 py-3 bg-gray-50'>
+                {row1.map(([key, label]) => (
+                  <StatCell key={key} label={label} value={statSource[key]} />
+                ))}
+              </div>
+              <div className='grid grid-cols-6 gap-y-3 px-2 pb-3 bg-gray-50 border-t border-gray-100'>
+                {row2.map(([key, label]) => (
+                  <StatCell key={key} label={label} value={statSource[key]} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className='text-center text-xs text-gray-400 py-4 italic'>
+              No stats available yet
+            </p>
           )}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 PlayerModal.propTypes = {
   setPlayerData: PropTypes.object.isRequired,
   handlePlayerModalClose: PropTypes.func.isRequired,
-};
+}
 
-export default PlayerModal;
+export default PlayerModal
