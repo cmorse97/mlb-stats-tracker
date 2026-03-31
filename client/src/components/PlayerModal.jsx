@@ -90,13 +90,14 @@ const PlayerModal = ({ setPlayerData, handlePlayerModalClose }) => {
           <div className='absolute inset-0 opacity-10'
             style={{ backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)', backgroundSize: '8px 8px' }}
           />
-          {/* team logo watermark */}
+          {/* team logo watermark — forced white so it shows on any team color */}
           {TEAM_IDS[team_abv] && (
             <img
               src={`https://www.mlbstatic.com/team-logos/${TEAM_IDS[team_abv]}.svg`}
               alt=''
               aria-hidden='true'
-              className='absolute inset-0 w-full h-full object-contain opacity-[0.12] scale-110 pointer-events-none'
+              className='absolute inset-0 w-full h-full object-contain opacity-20 scale-110 pointer-events-none'
+              style={{ filter: 'brightness(0) invert(1)' }}
             />
           )}
           <button
