@@ -7,7 +7,7 @@ export const getAllTeams = async (req, res) => {
     const { data: teams, error } = await supabase
       .from("teams")
       .select()
-      .order("id", { ascending: true });
+      .order("name", { ascending: true });
 
     if (error) throw error;
 

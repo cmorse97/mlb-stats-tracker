@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MLB Stats API — Data Schema</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 40px 24px; }
+    h1 { font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .subtitle { font-size: 0.875rem; color: #64748b; margin-bottom: 40px; }
+    .subtitle code { background: #1e2330; padding: 2px 6px; border-radius: 4px; color: #94a3b8; font-size: 0.8rem; }
+
+    /* FLOW */
+    .flow { display: flex; align-items: flex-start; gap: 0; margin-bottom: 48px; flex-wrap: wrap; }
+    .flow-step { display: flex; align-items: flex-start; gap: 0; }
+    .arrow { display: flex; align-items: center; padding: 0 6px; color: #334155; font-size: 1.2rem; margin-top: 22px; }
+
+    /* CARDS */
+    .card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 10px; padding: 16px; min-width: 200px; max-width: 240px; }
+    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .badge { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-get { background: #1a3a2a; color: #4ade80; border: 1px solid #166534; }
+    .badge-db  { background: #1a2a3a; color: #60a5fa; border: 1px solid #1e40af; }
+    .card-title { font-size: 0.8rem; font-weight: 600; color: #cbd5e1; font-family: monospace; }
+    .card-sub   { font-size: 0.7rem; color: #475569; margin-bottom: 10px; }
+    .field-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .field { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .field-name { font-size: 0.72rem; font-family: monospace; color: #94a3b8; }
+    .field-type { font-size: 0.65rem; color: #475569; white-space: nowrap; }
+    .field-name.highlight { color: #f59e0b; }
+    .divider { border: none; border-top: 1px solid #2d3748; margin: 8px 0; }
+
+    /* SECTIONS */
+    h2 { font-size: 1rem; font-weight: 600; color: #94a3b8; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .section { margin-bottom: 48px; }
+
+    /* MAPPING TABLE */
+    .map-grid { display: grid; grid-template-columns: 1fr 48px 1fr; gap: 0; max-width: 700px; }
+    .map-row { display: contents; }
+    .map-cell { padding: 6px 12px; font-size: 0.75rem; font-family: monospace; border-bottom: 1px solid #1e2330; }
+    .map-cell.api  { color: #a78bfa; background: #1a1a2e; border-radius: 6px 0 0 6px; }
+    .map-cell.mid  { color: #475569; background: #0f1117; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; border-bottom: 1px solid #1e2330; }
+    .map-cell.db   { color: #60a5fa; background: #1a2332; border-radius: 0 6px 6px 0; }
+    .map-header .map-cell { color: #64748b; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; font-family: inherit; padding: 4px 12px 8px; background: transparent; border-bottom: 2px solid #2d3748; }
+    .map-header .map-cell.mid { background: transparent; border-bottom: 2px solid #2d3748; }
+
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 860px; }
+    .stat-card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 10px; padding: 16px; }
+    .stat-card-title { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+    .stat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .stat-tag { font-size: 0.7rem; font-family: monospace; padding: 3px 8px; border-radius: 4px; }
+    .stat-tag.native  { background: #1a3a2a; color: #4ade80; border: 1px solid #166534; }
+    .stat-tag.jsonb   { background: #2a1a2a; color: #c084fc; border: 1px solid #6b21a8; }
+    .legend { display: flex; gap: 16px; margin-bottom: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #64748b; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<h1>MLB Stats API — Data Schema Reference</h1>
+<p class="subtitle">Base URL: <code>https://statsapi.mlb.com/api/v1</code> &nbsp;·&nbsp; No API key required &nbsp;·&nbsp; Season param: <code>?season=YYYY</code></p>
+
+<!-- ─── FLOW ─────────────────────────────────────── -->
+<div class="section">
+  <h2>Data Flow &amp; Endpoints</h2>
+  <div class="flow">
+
+    <!-- TEAMS -->
+    <div class="flow-step">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-get">GET</span>
+          <span class="card-title">/teams</span>
+        </div>
+        <p class="card-sub">?sportId=1&amp;season=YYYY</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name highlight">id</span>         <span class="field-type">integer — MLB team ID</span></li>
+          <li class="field"><span class="field-name">teamName</span>   <span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">locationName</span><span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">abbreviation</span><span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">league.id</span>  <span class="field-type">103=AL / 104=NL</span></li>
+          <li class="field"><span class="field-name">league.name</span><span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">division.name</span><span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">active</span>     <span class="field-type">boolean</span></li>
+        </ul>
+        <hr class="divider" />
+        <p class="card-sub">Logo (CDN, no API call)</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name">mlbstatic.com/team-logos/{id}.svg</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <!-- STANDINGS -->
+    <div class="flow-step">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-get">GET</span>
+          <span class="card-title">/standings</span>
+        </div>
+        <p class="card-sub">?leagueId=103,104&amp;season=YYYY</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name highlight">team.id</span>   <span class="field-type">join key</span></li>
+          <li class="field"><span class="field-name">wins</span>        <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">losses</span>      <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">runsScored</span>  <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">runsAllowed</span> <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">runDifferential</span><span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">winningPercentage</span><span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">divisionRank</span><span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">wildCardRank</span><span class="field-type">string</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <!-- TEAMS DB -->
+    <div class="flow-step">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-db">DB</span>
+          <span class="card-title">teams</span>
+        </div>
+        <p class="card-sub">Supabase · upsert on team_abv</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name highlight">mlb_id</span>      <span class="field-type">integer unique</span></li>
+          <li class="field"><span class="field-name">name</span>         <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">city</span>         <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">team_abv</span>     <span class="field-type">text unique</span></li>
+          <li class="field"><span class="field-name">league</span>       <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">league_abv</span>   <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">division</span>     <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">logo</span>         <span class="field-type">text (URL)</span></li>
+          <li class="field"><span class="field-name">wins</span>         <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">losses</span>       <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">runs_scored</span>  <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">runs_allowed</span> <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">run_diff</span>     <span class="field-type">integer</span></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PLAYERS ROW -->
+  <div class="flow">
+
+    <div class="flow-step">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-get">GET</span>
+          <span class="card-title">/teams/{id}/roster</span>
+        </div>
+        <p class="card-sub">?rosterType=active&amp;hydrate=person(...)</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name highlight">person.id</span>      <span class="field-type">integer — player ID</span></li>
+          <li class="field"><span class="field-name">person.fullName</span> <span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">person.birthDate</span><span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">person.height</span>   <span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">person.weight</span>   <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">person.batSide.code</span><span class="field-type">L/R/S</span></li>
+          <li class="field"><span class="field-name">person.pitchHand.code</span><span class="field-type">L/R</span></li>
+          <li class="field"><span class="field-name">jerseyNumber</span>    <span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">position.abbreviation</span><span class="field-type">string</span></li>
+        </ul>
+        <hr class="divider" />
+        <p class="card-sub">Headshot (CDN, no API call)</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name">img.mlbstatic.com/.../people/{id}/headshot/...</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="flow-step">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-get">GET</span>
+          <span class="card-title">/stats</span>
+        </div>
+        <p class="card-sub">?stats=season&amp;group=hitting|pitching<br>?playerPool=All&amp;sportId=1&amp;limit=2000</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name highlight">splits[].player.id</span><span class="field-type">join key</span></li>
+          <li class="field"><span class="field-name">splits[].stat</span>       <span class="field-type">object (see below)</span></li>
+          <li class="field"><span class="field-name">splits[].team.id</span>    <span class="field-type">integer</span></li>
+        </ul>
+        <hr class="divider" />
+        <p class="card-sub">Also used for game logs (Phase 2)</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name">?stats=gameLog&amp;group=hitting</span></li>
+          <li class="field"><span class="field-name">splits[].date</span>       <span class="field-type">string</span></li>
+          <li class="field"><span class="field-name">splits[].game.gamePk</span><span class="field-type">integer</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="flow-step">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-db">DB</span>
+          <span class="card-title">players</span>
+        </div>
+        <p class="card-sub">Supabase · upsert on player_id</p>
+        <ul class="field-list">
+          <li class="field"><span class="field-name highlight">player_id</span>    <span class="field-type">integer unique</span></li>
+          <li class="field"><span class="field-name">name</span>         <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">position</span>     <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">team_id</span>      <span class="field-type">integer</span></li>
+          <li class="field"><span class="field-name">team_abv</span>     <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">bday</span>         <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">jersey_number</span><span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">bats</span>         <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">throws</span>       <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">height</span>       <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">weight</span>       <span class="field-type">text</span></li>
+          <li class="field"><span class="field-name">avatar</span>       <span class="field-type">text (URL)</span></li>
+          <li class="field"><span class="field-name highlight">stats</span>         <span class="field-type">jsonb</span></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── STATS SCHEMA ──────────────────────────────── -->
+<div class="section">
+  <h2>Stats Object Schema (players.stats jsonb)</h2>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#1a3a2a;border:1px solid #166534"></div> Provided natively by MLB API</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2a1a2a;border:1px solid #6b21a8"></div> Stored in jsonb (access via stats-&gt;'Hitting'-&gt;&gt;'field')</div>
+  </div>
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-card-title">Hitting Stats · stats.Hitting</div>
+      <div class="stat-tags">
+        <span class="stat-tag native">avg</span>
+        <span class="stat-tag native">obp</span>
+        <span class="stat-tag native">slg</span>
+        <span class="stat-tag native">ops</span>
+        <span class="stat-tag native">hits</span>
+        <span class="stat-tag native">atBats</span>
+        <span class="stat-tag native">doubles</span>
+        <span class="stat-tag native">triples</span>
+        <span class="stat-tag native">homeRuns</span>
+        <span class="stat-tag native">rbi</span>
+        <span class="stat-tag native">plateAppearances</span>
+        <span class="stat-tag native">baseOnBalls</span>
+        <span class="stat-tag native">strikeOuts</span>
+        <span class="stat-tag native">stolenBases</span>
+        <span class="stat-tag native">runs</span>
+        <span class="stat-tag native">gamesPlayed</span>
+        <span class="stat-tag native">totalBases</span>
+        <span class="stat-tag native">babip</span>
+        <span class="stat-tag native">groundIntoDoublePlay</span>
+        <span class="stat-tag native">hitByPitch</span>
+        <span class="stat-tag native">intentionalWalks</span>
+        <span class="stat-tag native">sacFlies</span>
+        <span class="stat-tag native">sacBunts</span>
+        <span class="stat-tag native">atBatsPerHomeRun</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-title">Pitching Stats · stats.Pitching</div>
+      <div class="stat-tags">
+        <span class="stat-tag native">era</span>
+        <span class="stat-tag native">whip</span>
+        <span class="stat-tag native">wins</span>
+        <span class="stat-tag native">losses</span>
+        <span class="stat-tag native">inningsPitched</span>
+        <span class="stat-tag native">strikeOuts</span>
+        <span class="stat-tag native">baseOnBalls</span>
+        <span class="stat-tag native">strikeoutsPer9Inn</span>
+        <span class="stat-tag native">walksPer9Inn</span>
+        <span class="stat-tag native">strikeoutWalkRatio</span>
+        <span class="stat-tag native">saves</span>
+        <span class="stat-tag native">blownSaves</span>
+        <span class="stat-tag native">saveOpportunities</span>
+        <span class="stat-tag native">completeGames</span>
+        <span class="stat-tag native">shutouts</span>
+        <span class="stat-tag native">hits</span>
+        <span class="stat-tag native">runs</span>
+        <span class="stat-tag native">earnedRuns</span>
+        <span class="stat-tag native">homeRuns</span>
+        <span class="stat-tag native">gamesPlayed</span>
+        <span class="stat-tag native">gamesStarted</span>
+        <span class="stat-tag native">battersFaced</span>
+        <span class="stat-tag native">hitByPitch</span>
+        <span class="stat-tag native">intentionalWalks</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── FIELD MAPPING ─────────────────────────────── -->
+<div class="section">
+  <h2>API → Database Field Mapping</h2>
+  <div class="map-grid">
+    <div class="map-row map-header">
+      <div class="map-cell api">MLB API field</div>
+      <div class="map-cell mid"></div>
+      <div class="map-cell db">Supabase column</div>
+    </div>
+    <div class="map-row"><div class="map-cell api">team.id</div><div class="map-cell mid">→</div><div class="map-cell db">teams.mlb_id</div></div>
+    <div class="map-row"><div class="map-cell api">team.teamName</div><div class="map-cell mid">→</div><div class="map-cell db">teams.name</div></div>
+    <div class="map-row"><div class="map-cell api">team.locationName</div><div class="map-cell mid">→</div><div class="map-cell db">teams.city</div></div>
+    <div class="map-row"><div class="map-cell api">team.abbreviation</div><div class="map-cell mid">→</div><div class="map-cell db">teams.team_abv</div></div>
+    <div class="map-row"><div class="map-cell api">standings.wins</div><div class="map-cell mid">→</div><div class="map-cell db">teams.wins</div></div>
+    <div class="map-row"><div class="map-cell api">standings.losses</div><div class="map-cell mid">→</div><div class="map-cell db">teams.losses</div></div>
+    <div class="map-row"><div class="map-cell api">standings.runsScored</div><div class="map-cell mid">→</div><div class="map-cell db">teams.runs_scored</div></div>
+    <div class="map-row"><div class="map-cell api">standings.runsAllowed</div><div class="map-cell mid">→</div><div class="map-cell db">teams.runs_allowed</div></div>
+    <div class="map-row"><div class="map-cell api">standings.runDifferential</div><div class="map-cell mid">→</div><div class="map-cell db">teams.run_diff</div></div>
+    <div class="map-row"><div class="map-cell api">person.id</div><div class="map-cell mid">→</div><div class="map-cell db">players.player_id</div></div>
+    <div class="map-row"><div class="map-cell api">person.fullName</div><div class="map-cell mid">→</div><div class="map-cell db">players.name</div></div>
+    <div class="map-row"><div class="map-cell api">position.abbreviation</div><div class="map-cell mid">→</div><div class="map-cell db">players.position</div></div>
+    <div class="map-row"><div class="map-cell api">person.birthDate</div><div class="map-cell mid">→</div><div class="map-cell db">players.bday</div></div>
+    <div class="map-row"><div class="map-cell api">jerseyNumber</div><div class="map-cell mid">→</div><div class="map-cell db">players.jersey_number</div></div>
+    <div class="map-row"><div class="map-cell api">person.batSide.code</div><div class="map-cell mid">→</div><div class="map-cell db">players.bats</div></div>
+    <div class="map-row"><div class="map-cell api">person.pitchHand.code</div><div class="map-cell mid">→</div><div class="map-cell db">players.throws</div></div>
+    <div class="map-row"><div class="map-cell api">person.height</div><div class="map-cell mid">→</div><div class="map-cell db">players.height</div></div>
+    <div class="map-row"><div class="map-cell api">person.weight</div><div class="map-cell mid">→</div><div class="map-cell db">players.weight</div></div>
+    <div class="map-row"><div class="map-cell api">CDN headshot URL</div><div class="map-cell mid">→</div><div class="map-cell db">players.avatar</div></div>
+    <div class="map-row"><div class="map-cell api">stats splits[].stat (hitting)</div><div class="map-cell mid">→</div><div class="map-cell db">players.stats-&gt;'Hitting'</div></div>
+    <div class="map-row"><div class="map-cell api">stats splits[].stat (pitching)</div><div class="map-cell mid">→</div><div class="map-cell db">players.stats-&gt;'Pitching'</div></div>
+  </div>
+</div>
+
+</body>
+</html>
