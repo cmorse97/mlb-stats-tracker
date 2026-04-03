@@ -5,21 +5,18 @@ import morgan from 'morgan';
 import dataRoutes from './routes/dataRoutes.js';
 import playersRoute from './routes/playersRoutes.js';
 import teamsRoutes from './routes/teamsRoutes.js';
-import { updatePlayers, updateTeams } from './utils/updateSupabaseTables.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Cron jobs
-updatePlayers();
-updateTeams();
-
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+}));
 app.use(express.json());
 
 // Morgan Logger
-app.use(morgan('dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Routes
 app.use('/api/data', dataRoutes);
@@ -111,10 +108,10 @@ app.get('/api', (req, res) => {
     cron_jobs: [
       {
         schedule: '0 3 * * *',
-        timezone: 'America/New_York',
+        timezone: 'America/Chicago',
         jobs: ['update-teams', 'update-rosters'],
         description:
-          'Automatically syncs all teams and player data from MLB API every day at 3:00 AM ET',
+          'Render Cron Job runs scripts/sync.js daily at 3:00 AM CT',
       },
     ],
   });
