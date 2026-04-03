@@ -1,4 +1,5 @@
 import supabase from '../utils/supabaseClient.js'
+import { getLeagueLeaders } from '../services/leagueLeadersService.js'
 
 export const getAllPlayers = async (req, res) => {
 	try {
@@ -19,6 +20,20 @@ export const getAllPlayers = async (req, res) => {
 		res
 			.status(500)
 			.json({ message: 'Failed to fetch players', error: err.message })
+	}
+}
+
+export const getLeagueLeadersController = async (req, res) => {
+	try {
+		const leaders = await getLeagueLeaders()
+		res.status(200).json({
+			statusCode: 200,
+			message: 'League leaders fetched successfully',
+			body: leaders
+		})
+	} catch (err) {
+		console.error('Error fetching league leaders:', err)
+		res.status(500).json({ message: 'Failed to fetch league leaders', error: err.message })
 	}
 }
 

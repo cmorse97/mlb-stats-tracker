@@ -26,7 +26,8 @@ export const fetchTeams = async () => {
 				losses: record.losses,
 				runsScored: record.runsScored ?? 0,
 				runsAllowed: record.runsAllowed ?? 0,
-				runDiff: record.runDifferential ?? 0
+				runDiff: record.runDifferential ?? 0,
+				streak: record.streak?.streakCode ?? null
 			}
 		}
 	}
@@ -36,7 +37,7 @@ export const fetchTeams = async () => {
 	return teams.map(team => ({
 		mlb_id: team.id,
 		name: team.teamName,
-		city: team.locationName,
+		city: team.franchiseName,
 		team_abv: team.abbreviation,
 		league: team.league?.name ?? null,
 		league_abv: team.league?.id === 103 ? 'AL' : 'NL',
@@ -46,7 +47,8 @@ export const fetchTeams = async () => {
 		losses: standingsMap[team.id]?.losses ?? 0,
 		runs_scored: standingsMap[team.id]?.runsScored ?? 0,
 		runs_allowed: standingsMap[team.id]?.runsAllowed ?? 0,
-		run_diff: standingsMap[team.id]?.runDiff ?? 0
+		run_diff: standingsMap[team.id]?.runDiff ?? 0,
+		streak: standingsMap[team.id]?.streak ?? null
 	}))
 }
 

@@ -1,86 +1,75 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { CircularProgress, Container, Box, Grow, Grid } from '@mui/material'
-import { fetchTeams } from '../services/api'
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { fetchTeams } from "../services/api";
+
+// Full division names from the API, sorted East → Central → West
+const DIVISION_ORDER = ["East", "Central", "West"];
+
+const divisionSuffix = (divName) => divName?.split(" ").pop() ?? "";
+
+const groupTeams = (teams) => {
+  const leagues = { AL: {}, NL: {} };
+  teams.forEach((team) => {
+    const lg = team.league_abv;
+    if (!leagues[lg]) return;
+    const div = divisionSuffix(team.division);
+    if (!leagues[lg][div]) leagues[lg][div] = [];
+    leagues[lg][div].push(team);
+  });
+  return leagues;
+};
+
 const Teams = () => {
-	const [teamsData, setTeamsData] = useState([])
-	const [loading, setLoading] = useState(true)
+  const [teamsData, setTeamsData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		const getTeams = async () => {
-			const data = await fetchTeams()
-			setTeamsData(data)
-			setLoading(false)
-		}
+  useEffect(() => {
+    fetchTeams().then((data) => {
+      if (data) setTeamsData(data);
+      setLoading(false);
+    });
+  }, []);
 
-		getTeams()
-	}, [])
+  if (loading) {
+    return (
+      <div className="flex justify-center py-4">
+        <div className="w-5 h-5 border-2 border-blue-400 rounded-full animate-spin border-t-transparent" />
+      </div>
+    );
+  }
 
-	if (loading) {
-		return (
-			<Container maxWidth='lg'>
-				<Box
-					display='flex'
-					flexDirection='column'
-					gap={2}
-					marginTop={16}
-					justifyContent='center'
-					alignItems='center'
-				>
-					<CircularProgress />
-				</Box>
-			</Container>
-		)
-	}
+  const leagues = groupTeams(teamsData);
 
-	return (
-		<Container maxWidth='lg'>
-			<Grid container justifyContent='center' alignItems='center' spacing={2}>
-				{teamsData.map(({ team_abv, city, name, logo }) => (
-					<Grow in={true} timeout={1000} key={team_abv}>
-						<Grid item size={{ xs: 4, sm: 2, md: 2 }}>
-							<Grid
-								container
-								justifyContent='center'
-								alignItems='center'
-								sx={{ height: '100%' }}
-							>
-								<Link to={`/teams/${team_abv}`} style={{}}>
-									<Box
-										p={2}
-										sx={{
-											borderRadius: '50%',
-											display: 'flex',
-											justifyContent: 'center',
-											alignItems: 'center',
-											height: '100px',
-											width: '100px',
-											overflow: 'hidden', // Hide overflow to prevent image stretching
-											// add a hover effect for lg screen sizes only
-											'&:hover': {
-												transform: 'scale(1.1)',
-												transition: 'transform 0.5s ease-out'
-											}
-										}}
-									>
-										<img
-											src={logo}
-											alt={`${city} ${name}`}
-											style={{
-												maxWidth: '100%',
-												maxHeight: '100%',
-												objectFit: 'cover'
-											}} // Maintain aspect ratio and cover entire box
-										/>
-									</Box>
-								</Link>
-							</Grid>
-						</Grid>
-					</Grow>
-				))}
-			</Grid>
-		</Container>
-	)
-}
+  return (
+    <div className="space-y-3">
+      {["AL", "NL"].map((lg) => (
+        <div key={lg}>
+          <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1.5">
+            {lg === "AL" ? "American League" : "National League"}
+          </p>
+          {/* 15 logos per row: 5 teams × 3 divisions */}
+          <div className="grid grid-cols-15 gap-1" style={{ gridTemplateColumns: "repeat(15, minmax(0, 1fr))" }}>
+            {DIVISION_ORDER.flatMap((div) =>
+              (leagues[lg][div] ?? []).map((team) => (
+                <Link
+                  key={team.team_abv}
+                  to={`/teams/${team.team_abv}`}
+                  title={`${team.city} ${team.name}`}
+                  className="group flex items-center justify-center aspect-square p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <img
+                    src={team.logo}
+                    alt={`${team.city} ${team.name}`}
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-200"
+                  />
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-export default Teams
+export default Teams;

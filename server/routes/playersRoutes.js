@@ -1,11 +1,13 @@
 import express from 'express'
 import {
 	getAllPlayers,
-	getPlayerById
+	getPlayerById,
+	getLeagueLeadersController
 } from '../controllers/playersController.js'
 
 const router = express.Router()
 
+router.get('/league-leaders', getLeagueLeadersController)
 router.get('/', getAllPlayers)
 router.get('/:playerId', getPlayerById)
 

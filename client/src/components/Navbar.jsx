@@ -1,106 +1,80 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import {
-	AppBar,
-	Toolbar,
-	Typography,
-	IconButton,
-	Button,
-	Box,
-	Drawer,
-	List,
-	ListItem,
-	ListItemText,
-	useMediaQuery
-} from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu'
-import MultilineChartIcon from '@mui/icons-material/MultilineChart'
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { HiOutlineMenu, HiX } from "react-icons/hi";
+import { FaBaseballBall } from "react-icons/fa";
 
 const pages = [
-	{ name: 'Standings', path: 'standings' },
-	{ name: 'Top 100', path: 'top100' },
-	{ name: 'Analytics', path: 'analytics' }
-]
+  { name: "Home", path: "" },
+  { name: "Standings", path: "standings" },
+];
 
 const Navbar = () => {
-	const isMobile = useMediaQuery('(max-width: 600px)')
-	const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
-	// Toggle Drawer (Mobile Menu)
-	const handleDrawerToggle = () => {
-		setMobileOpen(!mobileOpen)
-	}
+  const isActive = (path) =>
+    path === "" ? location.pathname === "/" : location.pathname.startsWith(`/${path}`);
 
-	return (
-		<Box sx={{ flexGrow: 1 }}>
-			<AppBar position='static'>
-				<Toolbar>
-					{/* Logo / App Name */}
-					<Link
-						to='/'
-						style={{ textDecoration: 'none', color: '#fff', flexGrow: 1 }}
-					>
-						<Box display='flex' alignItems='center' gap={1}>
-							<MultilineChartIcon fontSize='large' />
-							<Typography variant='h6' sx={{ fontWeight: 'bold' }}>
-								MLB Stats Tracker
-							</Typography>
-						</Box>
-					</Link>
+  return (
+    <nav className="sticky top-0 z-40 bg-slate-900 shadow-md">
+      <div className="max-w-screen-lg flex items-center justify-between px-4 py-3 mx-auto">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-white hover:text-slate-300 transition-colors"
+        >
+          <FaBaseballBall className="text-lg" />
+          <span className="text-base font-bold tracking-wide">MLB Stats Tracker</span>
+        </Link>
 
-					{/* Desktop Navigation (Shown on medium & larger screens) */}
-					{!isMobile ? (
-						<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-							{pages.map(page => (
-								<Button key={page.name} sx={{ color: '#fff' }}>
-									<Link
-										to={`/${page.path}`}
-										style={{ color: '#fff', textDecoration: 'none' }}
-									>
-										{page.name}
-									</Link>
-								</Button>
-							))}
-						</Box>
-					) : (
-						// Mobile Menu Button (Hamburger)
-						<IconButton color='inherit' onClick={handleDrawerToggle}>
-							<MenuIcon />
-						</IconButton>
-					)}
-				</Toolbar>
-			</AppBar>
+        {/* Desktop links */}
+        <div className="hidden sm:flex items-center gap-1">
+          {pages.map((page) => (
+            <Link
+              key={page.name}
+              to={`/${page.path}`}
+              className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                isActive(page.path)
+                  ? "bg-white/10 text-white"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {page.name}
+            </Link>
+          ))}
+        </div>
 
-			{/* Mobile Drawer Menu */}
-			<Drawer
-				anchor='right'
-				open={mobileOpen}
-				onClose={handleDrawerToggle}
-				transitionDuration={500}
-				sx={{
-					flexShrink: 0,
-					'& .MuiDrawer-paper': { width: '33%', boxSizing: 'border-box' }
-				}}
-			>
-				<List>
-					{pages.map(page => (
-						<ListItem button key={page.name} onClick={handleDrawerToggle}>
-							<Link
-								to={`/${page.path}`}
-								style={{
-									textDecoration: 'none',
-									color: 'inherit',
-									width: '100%'
-								}}
-							>
-								<ListItemText primary={page.name} />
-							</Link>
-						</ListItem>
-					))}
-				</List>
-			</Drawer>
-		</Box>
-	)
-}
+        {/* Mobile button */}
+        <button
+          className="text-white sm:hidden"
+          onClick={() => setMobileOpen((p) => !p)}
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <HiX className="text-xl" /> : <HiOutlineMenu className="text-xl" />}
+        </button>
+      </div>
 
-export default Navbar
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="sm:hidden bg-slate-800 px-4 pb-4 pt-2 space-y-1">
+          {pages.map((page) => (
+            <Link
+              key={page.name}
+              to={`/${page.path}`}
+              onClick={() => setMobileOpen(false)}
+              className={`block text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+                isActive(page.path)
+                  ? "bg-white/10 text-white"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              {page.name}
+            </Link>
+          ))}
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Navbar;

@@ -1,121 +1,158 @@
-import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { fetchTeamByTeamAbv } from '../services/api'
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchTeamByTeamAbv } from '../services/api';
 import {
-	Box,
-	CircularProgress,
-	Container,
-	Typography,
-	Grid
-} from '@mui/material'
+  TEAM_COLORS,
+  getHeaderBg,
+  getPrimaryDarkUrl,
+  getWordmarkUrl,
+} from '../utils/teamConstants';
+import Loading from './Loading';
+
+const StatPill = ({ label, value, colorHex }) => (
+  <div
+    className="flex flex-col items-center px-3 py-1.5 rounded-lg"
+    style={{ backgroundColor: colorHex + '22' }}
+  >
+    <span className="text-[9px] font-bold tracking-widest uppercase text-white/60">
+      {label}
+    </span>
+    <span className="text-base font-bold text-white leading-tight">
+      {value ?? '—'}
+    </span>
+  </div>
+);
 
 const TeamStats = () => {
-	const [teamData, setTeamData] = useState({})
-	const { teamAbv } = useParams()
+  const [teamData, setTeamData] = useState(null);
+  const { teamAbv } = useParams();
 
-	useEffect(() => {
-		const fetchTeamData = async teamAbv => {
-			try {
-				const response = await fetchTeamByTeamAbv(teamAbv)
+  useEffect(() => {
+    fetchTeamByTeamAbv(teamAbv).then((data) => {
+      if (data) setTeamData(data);
+    });
+  }, [teamAbv]);
 
-				if (response !== null) setTeamData(response)
-			} catch (error) {
-				console.error('Error fetching team:', error)
-			}
-		}
+  if (!teamData) {
+    return <Loading />;
+  }
 
-		fetchTeamData(teamAbv)
-	}, [teamAbv])
+  const {
+    city,
+    name,
+    runs_allowed,
+    runs_scored,
+    run_diff,
+    league_abv,
+    division,
+    wins,
+    losses,
+    streak,
+  } = teamData;
+  const colors = TEAM_COLORS[teamAbv] ?? {
+    primary: '#1e293b',
+    secondary: '#334155',
+  };
+  const headerBg = getHeaderBg(teamAbv);
+  const wordmarkUrl = getWordmarkUrl(teamAbv);
+  const primaryDarkUrl = getPrimaryDarkUrl(teamAbv);
+  const divShort = division?.split(' ').pop(); // "American League East" → "East"
+  const runDiffDisplay = run_diff > 0 ? `+${run_diff}` : run_diff;
 
-	const {
-		city,
-		name,
-		runs_allowed,
-		runs_scored,
-		logo,
-		league_abv,
-		division,
-		wins,
-		losses
-	} = teamData
+  return (
+    <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+      {/* Colored header band */}
+      <div className="relative h-36" style={{ backgroundColor: headerBg }}>
+        {/* Diagonal texture */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)',
+            backgroundSize: '8px 8px',
+          }}
+        />
+        {/* Wordmark watermark — home-uniform name logo, pre-rendered white */}
+        {wordmarkUrl && (
+          <img
+            src={wordmarkUrl}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-contain opacity-20 pointer-events-none px-6"
+          />
+        )}
 
-	return (
-		<Container maxWidth='lg'>
-			{!teamData ? (
-				<Box display='flex' alignItems='center' justifyContent='center'>
-					<CircularProgress />
-				</Box>
-			) : (
-				<Grid
-					container
-					spacing={{ xs: 2, md: 0 }}
-					my={4}
-					alignItems='center'
-					justifyContent='center'
-				>
-					{/* Team Logo */}
-					<Grid size={{ xs: 12, md: 4 }}>
-						<Box display='flex' justifyContent='center'>
-							<img
-								src={logo}
-								alt={`${city} ${name}`}
-								style={{
-									width: '80%',
-									maxWidth: '200px',
-									height: 'auto',
-									objectFit: 'contain'
-								}}
-							/>
-						</Box>
-					</Grid>
+        {/* League / division badge — top left */}
+        <div className="absolute top-3 left-4 flex items-center gap-1.5">
+          <span
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white/80 tracking-widest uppercase"
+            style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
+          >
+            {league_abv} · {divShort}
+          </span>
+        </div>
 
-					{/* Team Info */}
-					<Grid size={{ xs: 6, md: 4 }}>
-						<Box
-							py={4}
-							display='flex'
-							flexDirection='column'
-							alignItems='center'
-							textAlign='center'
-						>
-							<Typography variant='h5' gutterBottom>
-								{city} {name}
-							</Typography>
-							<Typography variant='h6' gutterBottom color='text.secondary'>
-								{league_abv} {division}
-							</Typography>
-							<Typography variant='body1'>
-								({wins} - {losses})
-							</Typography>
-						</Box>
-					</Grid>
+        {/* Streak — top right */}
+        {streak && (
+          <div className="absolute bottom-3.75 left-30 flex items-center gap-1.5">
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.15)',
+                color: '#fff',
+              }}
+            >
+              streak · {streak}
+            </span>
+          </div>
+        )}
 
-					{/* Team Stats */}
-					<Grid size={{ xs: 6, md: 4 }}>
-						<Box
-							textAlign='center'
-							py={4}
-							display='flex'
-							flexDirection='column'
-							alignItems='center'
-						>
-							<Typography variant='h5' gutterBottom>
-								Team Stats
-							</Typography>
-							<Typography variant='body1'>
-								Runs Scored:{' '}
-								<Typography component='strong'>{runs_scored}</Typography>
-							</Typography>
-							<Typography variant='body1'>
-								Runs Allowed:{' '}
-								<Typography component='strong'>{runs_allowed}</Typography>
-							</Typography>
-						</Box>
-					</Grid>
-				</Grid>
-			)}
-		</Container>
-	)
-}
+        {/* Bottom: logo + name + record + stat pills */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 flex items-end justify-between gap-4">
+          {/* Logo + name */}
+          <div className="flex items-end gap-3">
+            {primaryDarkUrl && (
+              <img
+                src={primaryDarkUrl}
+                alt={`${city} ${name}`}
+                className="w-14 h-14 object-contain drop-shadow-lg"
+              />
+            )}
+            <div>
+              <p className="text-white/60 text-xs font-medium leading-none mb-0.5">
+                {city}
+              </p>
+              <h1 className="text-white text-2xl font-bold leading-tight">
+                {name}
+              </h1>
+              <p className="text-white/70 text-sm font-semibold leading-snug">
+                {wins}–{losses}
+              </p>
+            </div>
+          </div>
 
-export default TeamStats
+          {/* Stat pills */}
+          <div className="flex gap-2 pb-1">
+            <StatPill
+              label="RS"
+              value={runs_scored}
+              colorHex={colors.secondary}
+            />
+            <StatPill
+              label="RA"
+              value={runs_allowed}
+              colorHex={colors.secondary}
+            />
+            <StatPill
+              label="DIFF"
+              value={runDiffDisplay}
+              colorHex={colors.secondary}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TeamStats;
