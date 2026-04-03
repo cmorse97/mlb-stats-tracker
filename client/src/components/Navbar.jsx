@@ -1,65 +1,72 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { HiOutlineMenu } from "react-icons/hi";
-import { MdMultilineChart } from "react-icons/md";
+import { Link, useLocation } from "react-router-dom";
+import { HiOutlineMenu, HiX } from "react-icons/hi";
+import { FaBaseballBall } from "react-icons/fa";
 
 const pages = [
   { name: "Home", path: "" },
   { name: "Standings", path: "standings" },
-  { name: "Top 100", path: "top100" },
-  { name: "Analytics", path: "analytics" },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
-  const toggleMobileMenu = () => {
-    setMobileOpen((prev) => !prev);
-  };
+  const isActive = (path) =>
+    path === "" ? location.pathname === "/" : location.pathname.startsWith(`/${path}`);
 
   return (
-    <nav className="sticky top-0 text-white bg-blue-900 shadow-md">
-      <div className="container flex items-center justify-between px-4 py-3 mx-auto">
-        {/* Logo / Title */}
+    <nav className="sticky top-0 z-40 bg-slate-900 shadow-md">
+      <div className="max-w-screen-lg flex items-center justify-between px-4 py-3 mx-auto">
+        {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-white transition-all duration-300 ease-in-out hover:text-blue-300 hover:scale-105"
+          className="flex items-center gap-2 text-white hover:text-slate-300 transition-colors"
         >
-          <MdMultilineChart className="text-2xl" />
-          <span className="text-xl font-bold">MLB Stats Tracker</span>
+          <FaBaseballBall className="text-lg" />
+          <span className="text-base font-bold tracking-wide">MLB Stats Tracker</span>
         </Link>
 
-        {/* Desktop Nav Links */}
-        <div className="hidden gap-6 sm:flex">
+        {/* Desktop links */}
+        <div className="hidden sm:flex items-center gap-1">
           {pages.map((page) => (
             <Link
               key={page.name}
               to={`/${page.path}`}
-              className="transition duration-300 ease-in-out hover:text-blue-300 hover:scale-105"
+              className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                isActive(page.path)
+                  ? "bg-white/10 text-white"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              }`}
             >
               {page.name}
             </Link>
           ))}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile button */}
         <button
-          className="text-white sm:hidden focus:outline-none"
-          onClick={toggleMobileMenu}
+          className="text-white sm:hidden"
+          onClick={() => setMobileOpen((p) => !p)}
+          aria-label="Toggle menu"
         >
-          <HiOutlineMenu className="text-2xl" />
+          {mobileOpen ? <HiX className="text-xl" /> : <HiOutlineMenu className="text-xl" />}
         </button>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="px-4 py-3 space-y-3 text-white bg-blue-800 sm:hidden">
+        <div className="sm:hidden bg-slate-800 px-4 pb-4 pt-2 space-y-1">
           {pages.map((page) => (
             <Link
               key={page.name}
               to={`/${page.path}`}
-              className="block w-full transition duration-200 hover:text-blue-300"
-              onClick={toggleMobileMenu}
+              onClick={() => setMobileOpen(false)}
+              className={`block text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+                isActive(page.path)
+                  ? "bg-white/10 text-white"
+                  : "text-slate-400 hover:text-white"
+              }`}
             >
               {page.name}
             </Link>

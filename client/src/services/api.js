@@ -51,6 +51,17 @@ export const fetchTopPerformers = async (teamAbv) => {
   }
 };
 
+// Get league leaders from backend API
+export const fetchLeagueLeaders = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/players/league-leaders`);
+    return response.data.body;
+  } catch (error) {
+    console.error("Error fetching league leaders:", error);
+    return null;
+  }
+};
+
 // Get standings from backend API
 export const fetchStandings = async () => {
   try {

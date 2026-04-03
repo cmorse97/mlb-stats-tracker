@@ -1,4 +1,4 @@
-import supabase from "../utils/supabaseClient.js";
+import supabase from '../utils/supabaseClient.js';
 
 const parseStat = (val) => {
   const num = parseFloat(val);
@@ -13,203 +13,228 @@ const parseStatLowIsBetter = (val) => {
 export const getTopPerformersByTeamAbv = async (teamAbv) => {
   // Fetch roster
   const { data: players, error } = await supabase
-    .from("players")
-    .select("*")
-    .eq("team_abv", teamAbv);
+    .from('players')
+    .select('*')
+    .eq('team_abv', teamAbv);
 
   if (error) throw error;
 
-  // Stat logic
-  const hitters = {
-    hits: null,
-    hr: null,
-    rbi: null,
-    avg: null,
-    ops: null,
-    slg: null,
+  // Each key holds the full player object currently leading that stat category
+  const hittingLeaders = {
+    hitsLeader: null,
+    hrLeader: null,
+    rbiLeader: null,
+    avgLeader: null,
+    opsLeader: null,
+    slgLeader: null,
   };
 
-  const pitchers = {
-    wins: null,
-    era: null,
-    strikeouts: null,
-    saves: null,
-    whip: null,
-    walks: null,
+  const pitchingLeaders = {
+    winsLeader: null,
+    eraLeader: null,
+    strikeoutsLeader: null,
+    savesLeader: null,
+    whipLeader: null,
+    walksLeader: null,
   };
 
   players.forEach((player) => {
-    const hitting = player.stats?.Hitting;
-    const pitching = player.stats?.Pitching;
+    const hittingStat = player.stats?.Hitting;
+    const pitchingStat = player.stats?.Pitching;
 
-    // Hitter: Hits (H), HR, RBI, avg, OPS, SLG
-    if (hitting) {
+    // Hitter: Hits, HR, RBI, AVG, OPS, SLG
+    if (hittingStat) {
       if (
-        !hitters.hits ||
-        parseStat(hitting.H) > parseStat(hitters.hits.stats.Hitting.H)
+        !hittingLeaders.hitsLeader ||
+        parseStat(hittingStat.hits) >
+          parseStat(hittingLeaders.hitsLeader.stats.Hitting.hits)
       )
-        hitters.hits = player;
-
-      if (
-        !hitters.hr ||
-        parseStat(hitting.HR) > parseStat(hitters.hr.stats.Hitting.HR)
-      )
-        hitters.hr = player;
+        hittingLeaders.hitsLeader = player;
 
       if (
-        !hitters.rbi ||
-        parseStat(hitting.RBI) > parseStat(hitters.rbi.stats.Hitting.RBI)
+        !hittingLeaders.hrLeader ||
+        parseStat(hittingStat.homeRuns) >
+          parseStat(hittingLeaders.hrLeader.stats.Hitting.homeRuns)
       )
-        hitters.rbi = player;
+        hittingLeaders.hrLeader = player;
 
       if (
-        !hitters.avg ||
-        parseStat(hitting.avg) > parseStat(hitters.avg.stats.Hitting.avg)
+        !hittingLeaders.rbiLeader ||
+        parseStat(hittingStat.rbi) >
+          parseStat(hittingLeaders.rbiLeader.stats.Hitting.rbi)
       )
-        hitters.avg = player;
+        hittingLeaders.rbiLeader = player;
+
       if (
-        !hitters.ops ||
-        parseStat(hitting.OPS) > parseStat(hitters.ops.stats.Hitting.OPS)
+        !hittingLeaders.avgLeader ||
+        parseStat(hittingStat.avg) >
+          parseStat(hittingLeaders.avgLeader.stats.Hitting.avg)
       )
-        hitters.ops = player;
+        hittingLeaders.avgLeader = player;
+
       if (
-        !hitters.slg ||
-        parseStat(hitting.SLG) > parseStat(hitters.slg.stats.Hitting.SLG)
+        !hittingLeaders.opsLeader ||
+        parseStat(hittingStat.ops) >
+          parseStat(hittingLeaders.opsLeader.stats.Hitting.ops)
       )
-        hitters.slg = player;
+        hittingLeaders.opsLeader = player;
+
+      if (
+        !hittingLeaders.slgLeader ||
+        parseStat(hittingStat.slg) >
+          parseStat(hittingLeaders.slgLeader.stats.Hitting.slg)
+      )
+        hittingLeaders.slgLeader = player;
     }
 
-    // Pitcher: Wins, ERA (lower), SO, Save, WHIP (lower), BB (lower)
-    if (pitching) {
+    // Pitcher: Wins, ERA (lower), SO, Saves, WHIP (lower), BB (lower)
+    if (pitchingStat) {
       if (
-        !pitchers.wins ||
-        parseStat(pitching.Win) > parseStat(pitchers.wins.stats.Pitching.Win)
+        !pitchingLeaders.winsLeader ||
+        parseStat(pitchingStat.wins) >
+          parseStat(pitchingLeaders.winsLeader.stats.Pitching.wins)
       )
-        pitchers.wins = player;
+        pitchingLeaders.winsLeader = player;
 
       if (
-        !pitchers.era ||
-        parseStatLowIsBetter(pitching.ERA) <
-          parseStatLowIsBetter(pitchers.era.stats.Pitching.ERA)
+        !pitchingLeaders.eraLeader ||
+        parseStatLowIsBetter(pitchingStat.era) <
+          parseStatLowIsBetter(pitchingLeaders.eraLeader.stats.Pitching.era)
       )
-        pitchers.era = player;
+        pitchingLeaders.eraLeader = player;
 
       if (
-        !pitchers.strikeouts ||
-        parseStat(pitching.SO) >
-          parseStat(pitchers.strikeouts.stats.Pitching.SO)
+        !pitchingLeaders.strikeoutsLeader ||
+        parseStat(pitchingStat.strikeOuts) >
+          parseStat(pitchingLeaders.strikeoutsLeader.stats.Pitching.strikeOuts)
       )
-        pitchers.strikeouts = player;
+        pitchingLeaders.strikeoutsLeader = player;
 
       if (
-        !pitchers.saves ||
-        parseStat(pitching.Save) > parseStat(pitchers.saves.stats.Pitching.Save)
+        !pitchingLeaders.savesLeader ||
+        parseStat(pitchingStat.saves) >
+          parseStat(pitchingLeaders.savesLeader.stats.Pitching.saves)
       )
-        pitchers.saves = player;
+        pitchingLeaders.savesLeader = player;
 
       if (
-        !pitchers.whip ||
-        parseStatLowIsBetter(pitching.WHIP) <
-          parseStatLowIsBetter(pitchers.whip.stats.Pitching.WHIP)
+        !pitchingLeaders.whipLeader ||
+        parseStatLowIsBetter(pitchingStat.whip) <
+          parseStatLowIsBetter(pitchingLeaders.whipLeader.stats.Pitching.whip)
       )
-        pitchers.whip = player;
+        pitchingLeaders.whipLeader = player;
+
       if (
-        !pitchers.walks ||
-        parseStatLowIsBetter(pitching.BB) <
-          parseStatLowIsBetter(pitchers.walks.stats.Pitching.BB)
+        !pitchingLeaders.walksLeader ||
+        parseStatLowIsBetter(pitchingStat.baseOnBalls) <
+          parseStatLowIsBetter(
+            pitchingLeaders.walksLeader.stats.Pitching.baseOnBalls,
+          )
       )
-        pitchers.walks = player;
+        pitchingLeaders.walksLeader = player;
     }
   });
+
+  // Guard: ensure we found at least one player for each category
+  const missingHitter = Object.entries(hittingLeaders).find(
+    ([, v]) => v === null,
+  );
+  const missingPitcher = Object.entries(pitchingLeaders).find(
+    ([, v]) => v === null,
+  );
+  if (missingHitter)
+    throw new Error(`No hitter found for stat: ${missingHitter[0]}`);
+  if (missingPitcher)
+    throw new Error(`No pitcher found for stat: ${missingPitcher[0]}`);
 
   // Return formatted
   return {
     hitters: [
       {
-        player_id: hitters.hits.player_id,
-        name: hitters.hits.name,
-        avatar: hitters.hits.avatar,
-        stat: "Hits",
-        value: hitters.hits.stats.Hitting.H,
+        player_id: hittingLeaders.hitsLeader.player_id,
+        name: hittingLeaders.hitsLeader.name,
+        avatar: hittingLeaders.hitsLeader.avatar,
+        stat: 'Hits',
+        value: hittingLeaders.hitsLeader.stats?.Hitting.hits,
       },
       {
-        player_id: hitters.hr.player_id,
-        name: hitters.hr.name,
-        avatar: hitters.hr.avatar,
-        stat: "HR",
-        value: hitters.hr.stats.Hitting.HR,
+        player_id: hittingLeaders.hrLeader.player_id,
+        name: hittingLeaders.hrLeader.name,
+        avatar: hittingLeaders.hrLeader.avatar,
+        stat: 'HR',
+        value: hittingLeaders.hrLeader.stats?.Hitting.homeRuns,
       },
       {
-        player_id: hitters.rbi.player_id,
-        name: hitters.rbi.name,
-        avatar: hitters.rbi.avatar,
-        stat: "RBI",
-        value: hitters.rbi.stats.Hitting.RBI,
+        player_id: hittingLeaders.rbiLeader.player_id,
+        name: hittingLeaders.rbiLeader.name,
+        avatar: hittingLeaders.rbiLeader.avatar,
+        stat: 'RBI',
+        value: hittingLeaders.rbiLeader.stats?.Hitting.rbi,
       },
       {
-        player_id: hitters.avg.player_id,
-        name: hitters.avg.name,
-        avatar: hitters.avg.avatar,
-        stat: "AVG",
-        value: hitters.avg.stats.Hitting.avg,
+        player_id: hittingLeaders.avgLeader.player_id,
+        name: hittingLeaders.avgLeader.name,
+        avatar: hittingLeaders.avgLeader.avatar,
+        stat: 'AVG',
+        value: hittingLeaders.avgLeader.stats?.Hitting.avg,
       },
       {
-        player_id: hitters.ops.player_id,
-        name: hitters.ops.name,
-        avatar: hitters.ops.avatar,
-        stat: "OPS",
-        value: hitters.ops.stats.Hitting.OPS,
+        player_id: hittingLeaders.opsLeader.player_id,
+        name: hittingLeaders.opsLeader.name,
+        avatar: hittingLeaders.opsLeader.avatar,
+        stat: 'OPS',
+        value: hittingLeaders.opsLeader.stats?.Hitting.ops,
       },
       {
-        player_id: hitters.slg.player_id,
-        name: hitters.slg.name,
-        avatar: hitters.slg.avatar,
-        stat: "SLG",
-        value: hitters.slg.stats.Hitting.SLG,
+        player_id: hittingLeaders.slgLeader.player_id,
+        name: hittingLeaders.slgLeader.name,
+        avatar: hittingLeaders.slgLeader.avatar,
+        stat: 'SLG',
+        value: hittingLeaders.slgLeader.stats?.Hitting.slg,
       },
     ],
     pitchers: [
       {
-        player_id: pitchers.wins.player_id,
-        name: pitchers.wins.name,
-        avatar: pitchers.wins.avatar,
-        stat: "Wins",
-        value: pitchers.wins.stats.Pitching.Win,
+        player_id: pitchingLeaders.winsLeader.player_id,
+        name: pitchingLeaders.winsLeader.name,
+        avatar: pitchingLeaders.winsLeader.avatar,
+        stat: 'Wins',
+        value: pitchingLeaders.winsLeader.stats?.Pitching.wins,
       },
       {
-        player_id: pitchers.era.player_id,
-        name: pitchers.era.name,
-        avatar: pitchers.era.avatar,
-        stat: "ERA",
-        value: pitchers.era.stats.Pitching.ERA,
+        player_id: pitchingLeaders.eraLeader.player_id,
+        name: pitchingLeaders.eraLeader.name,
+        avatar: pitchingLeaders.eraLeader.avatar,
+        stat: 'ERA',
+        value: pitchingLeaders.eraLeader.stats?.Pitching.era,
       },
       {
-        player_id: pitchers.strikeouts.player_id,
-        name: pitchers.strikeouts.name,
-        avatar: pitchers.strikeouts.avatar,
-        stat: "SO",
-        value: pitchers.strikeouts.stats.Pitching.SO,
+        player_id: pitchingLeaders.strikeoutsLeader.player_id,
+        name: pitchingLeaders.strikeoutsLeader.name,
+        avatar: pitchingLeaders.strikeoutsLeader.avatar,
+        stat: 'SO',
+        value: pitchingLeaders.strikeoutsLeader.stats?.Pitching.strikeOuts,
       },
       {
-        player_id: pitchers.saves.player_id,
-        name: pitchers.saves.name,
-        avatar: pitchers.saves.avatar,
-        stat: "Saves",
-        value: pitchers.saves.stats.Pitching.Save,
+        player_id: pitchingLeaders.savesLeader.player_id,
+        name: pitchingLeaders.savesLeader.name,
+        avatar: pitchingLeaders.savesLeader.avatar,
+        stat: 'Saves',
+        value: pitchingLeaders.savesLeader.stats?.Pitching.saves,
       },
       {
-        player_id: pitchers.whip.player_id,
-        name: pitchers.whip.name,
-        avatar: pitchers.whip.avatar,
-        stat: "WHIP",
-        value: pitchers.whip.stats.Pitching.WHIP,
+        player_id: pitchingLeaders.whipLeader.player_id,
+        name: pitchingLeaders.whipLeader.name,
+        avatar: pitchingLeaders.whipLeader.avatar,
+        stat: 'WHIP',
+        value: pitchingLeaders.whipLeader.stats?.Pitching.whip,
       },
       {
-        player_id: pitchers.walks.player_id,
-        name: pitchers.walks.name,
-        avatar: pitchers.walks.avatar,
-        stat: "BB",
-        value: pitchers.walks.stats.Pitching.BB,
+        player_id: pitchingLeaders.walksLeader.player_id,
+        name: pitchingLeaders.walksLeader.name,
+        avatar: pitchingLeaders.walksLeader.avatar,
+        stat: 'BB',
+        value: pitchingLeaders.walksLeader.stats?.Pitching.baseOnBalls,
       },
     ],
   };

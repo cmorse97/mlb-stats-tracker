@@ -1,110 +1,106 @@
-import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import { useParams } from "react-router-dom";
-import { fetchRosterByTeamAbv } from "../services/api";
-import { quickSortRoster } from "../utils/sortRosterTable";
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchRosterByTeamAbv } from '../services/api';
+import { quickSortRoster } from '../utils/sortRosterTable';
 
-const labels = [
-  { key: "position", label: "Position" },
-  { key: "name", label: "Name" },
-  { key: "jersey_number", label: "Number" },
+const COLUMNS = [
+  { key: 'position', label: 'POS' },
+  { key: 'name',     label: 'Name' },
+  { key: 'jersey_number', label: '#' },
 ];
+
+const SortIcon = ({ active, descending }) => {
+  if (!active) return <span className="text-gray-300 text-[10px]">↕</span>;
+  return <span className="text-[10px]">{descending ? '▼' : '▲'}</span>;
+};
 
 const RosterTable = ({ setPlayerData, handlePlayerModalOpen }) => {
   const [rosterData, setRosterData] = useState([]);
-  const [sortConfig, setSortConfig] = useState({
-    key: "name",
-    descending: false,
-  });
+  const [sortConfig, setSortConfig] = useState({ key: 'position', descending: false });
   const { teamAbv } = useParams();
 
   useEffect(() => {
-    const fetchRosterData = async (teamAbv) => {
-      try {
-        const response = await fetchRosterByTeamAbv(teamAbv);
-        const sortedData = quickSortRoster([...response], "name", false);
-        setRosterData(sortedData);
-      } catch (error) {
-        console.error("Error fetching team roster:", error);
-      }
-    };
-
-    fetchRosterData(teamAbv);
+    fetchRosterByTeamAbv(teamAbv).then((data) => {
+      if (data) setRosterData(quickSortRoster([...data], 'position', false));
+    }).catch(console.error);
   }, [teamAbv]);
 
   const handleSort = (key) => {
-    const isDescending =
-      sortConfig.key === key ? !sortConfig.descending : false;
-    const sortedRoster = quickSortRoster([...rosterData], key, isDescending);
-    setRosterData(sortedRoster);
-    setSortConfig({ key, descending: isDescending });
+    const descending = sortConfig.key === key ? !sortConfig.descending : false;
+    setRosterData(quickSortRoster([...rosterData], key, descending));
+    setSortConfig({ key, descending });
   };
 
-  if (!rosterData.length) {
-    return (
-      <div className="flex items-center justify-center my-16">
-        <div className="w-10 h-10 border-t-4 border-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="my-6 overflow-x-auto rounded-lg shadow-xl">
-      <table className="min-w-full bg-white divide-y divide-gray-200">
-        <thead className="bg-gray-100">
-          <tr>
-            {labels.map(({ key, label }) => (
-              <th
-                key={key}
-                className="px-6 py-3 text-sm font-semibold text-center text-gray-700 cursor-pointer"
-                onClick={() => handleSort(key)}
-              >
-                <div className="flex items-center justify-center gap-1">
-                  {label}
-                  {sortConfig.key === key ? (
-                    sortConfig.descending ? (
-                      <span>▼</span>
-                    ) : (
-                      <span>▲</span>
-                    )
-                  ) : (
-                    <span className="text-gray-400">↕</span>
-                  )}
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {rosterData.map((player, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="px-6 py-3 text-sm text-center text-gray-700">
-                {player.position}
-              </td>
-              <td className="px-6 py-3 text-sm text-gray-800">
-                <button
-                  className="flex items-center gap-2 mx-auto cursor-pointer"
-                  onClick={() => {
-                    setPlayerData(player);
-                    handlePlayerModalOpen();
-                  }}
-                  disabled={Object.keys(player).length === 0}
-                >
-                  <img
-                    src={player.avatar}
-                    alt={player.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span>{player.name}</span>
-                </button>
-              </td>
-              <td className="px-6 py-3 text-sm text-center text-gray-700">
-                {player.jersey_number}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between border-b border-gray-100">
+        <h2 className="text-sm font-bold text-gray-800 tracking-wide uppercase">Roster</h2>
+        {rosterData.length > 0 && (
+          <span className="text-[10px] text-gray-400">{rosterData.length} players</span>
+        )}
+      </div>
+
+      {/* Table */}
+      {!rosterData.length ? (
+        <div className="flex items-center justify-center h-40">
+          <div className="w-5 h-5 border-2 border-blue-400 rounded-full animate-spin border-t-transparent" />
+        </div>
+      ) : (
+        <div className="overflow-y-auto flex-1">
+          <table className="w-full text-xs">
+            <thead className="sticky top-0 bg-gray-50 border-b border-gray-100">
+              <tr>
+                {COLUMNS.map(({ key, label }) => (
+                  <th
+                    key={key}
+                    onClick={() => handleSort(key)}
+                    className="px-3 py-2 text-left font-bold text-gray-500 tracking-wider uppercase cursor-pointer hover:text-gray-700 select-none"
+                  >
+                    <span className="flex items-center gap-1">
+                      {label}
+                      <SortIcon
+                        active={sortConfig.key === key}
+                        descending={sortConfig.descending}
+                      />
+                    </span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {rosterData.map((player) => {
+                const { position, name, avatar, jersey_number } = player;
+                return (
+                  <tr key={name} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-3 py-2 text-gray-500 font-medium w-12">{position}</td>
+                    <td className="px-3 py-2">
+                      <button
+                        className="flex items-center gap-2 text-left w-full cursor-pointer"
+                        onClick={() => { setPlayerData(player); handlePlayerModalOpen(); }}
+                        disabled={!name}
+                      >
+                        <img
+                          src={avatar}
+                          alt={name}
+                          className="w-7 h-7 rounded-full object-cover border border-gray-100 shrink-0"
+                          onError={(e) => {
+                            e.target.src =
+                              'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/0/headshot/67/current';
+                          }}
+                        />
+                        <span className="font-semibold text-gray-800 truncate">{name}</span>
+                      </button>
+                    </td>
+                    <td className="px-3 py-2 text-gray-500 text-center w-10">{jersey_number}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

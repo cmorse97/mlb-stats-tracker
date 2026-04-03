@@ -1,10 +1,11 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import dataRoutes from "./routes/dataRoutes.js";
-import teamsRoutes from "./routes/teamsRoutes.js";
-import playersRoute from "./routes/playersRoutes.js";
-import { updatePlayers, updateTeams } from "./utils/updateSupabaseTables.js";
+import cors from 'cors';
+import 'dotenv/config';
+import express from 'express';
+import morgan from 'morgan';
+import dataRoutes from './routes/dataRoutes.js';
+import playersRoute from './routes/playersRoutes.js';
+import teamsRoutes from './routes/teamsRoutes.js';
+import { updatePlayers, updateTeams } from './utils/updateSupabaseTables.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,91 +18,103 @@ updateTeams();
 app.use(cors());
 app.use(express.json());
 
+// Morgan Logger
+app.use(morgan('dev'));
+
 // Routes
-app.use("/api/data", dataRoutes);
-app.use("/api/teams", teamsRoutes); // Get all teams
-app.use("/api/teams/:teamAbv", teamsRoutes); // Get single team
-app.use("/api/teams/:teamAbv/roster", teamsRoutes); // Get players from a team's roster
-app.use("/api/teams/:teamAbv/top-performers", teamsRoutes); // Get top performers from a team's roster
-app.use("/api/teams/standings", teamsRoutes); // Get standings
-app.use("/api/players", playersRoute); // Get all players
-app.use("/api/players/:playerId", playersRoute); // Get single player by id
+app.use('/api/data', dataRoutes);
+app.use('/api/teams', teamsRoutes); // Get all teams
+app.use('/api/teams/:teamAbv', teamsRoutes); // Get single team
+app.use('/api/teams/:teamAbv/roster', teamsRoutes); // Get players from a team's roster
+app.use('/api/teams/:teamAbv/top-performers', teamsRoutes); // Get top performers from a team's roster
+app.use('/api/teams/standings', teamsRoutes); // Get standings
+app.use('/api/players', playersRoute); // Get all players + sub-routes
 
 // API directory
-app.get("/api", (req, res) => {
+app.get('/api', (req, res) => {
   res.status(200).json({
     statusCode: 200,
-    message: "MLB Stats Tracker API",
-    version: "1.0.0",
-    data_source: "statsapi.mlb.com",
+    message: 'MLB Stats Tracker API',
+    version: '1.0.0',
+    data_source: 'statsapi.mlb.com',
     routes: {
       teams: [
         {
-          method: "GET",
-          path: "/api/teams",
-          description: "Get all 30 MLB teams with standings data",
+          method: 'GET',
+          path: '/api/teams',
+          description: 'Get all 30 MLB teams with standings data',
           params: null,
         },
         {
-          method: "GET",
-          path: "/api/teams/standings",
-          description: "Get full league standings grouped by division",
+          method: 'GET',
+          path: '/api/teams/standings',
+          description: 'Get full league standings grouped by division',
           params: null,
         },
         {
-          method: "GET",
-          path: "/api/teams/:teamAbv",
-          description: "Get a single team by abbreviation",
-          params: { teamAbv: "e.g. NYY, LAD, BOS" },
+          method: 'GET',
+          path: '/api/teams/:teamAbv',
+          description: 'Get a single team by abbreviation',
+          params: { teamAbv: 'e.g. NYY, LAD, BOS' },
         },
         {
-          method: "GET",
-          path: "/api/teams/:teamAbv/roster",
-          description: "Get the active roster for a team",
-          params: { teamAbv: "e.g. NYY, LAD, BOS" },
+          method: 'GET',
+          path: '/api/teams/:teamAbv/roster',
+          description: 'Get the active roster for a team',
+          params: { teamAbv: 'e.g. NYY, LAD, BOS' },
         },
         {
-          method: "GET",
-          path: "/api/teams/:teamAbv/top-performers",
-          description: "Get top performing players for a team",
-          params: { teamAbv: "e.g. NYY, LAD, BOS" },
+          method: 'GET',
+          path: '/api/teams/:teamAbv/top-performers',
+          description: 'Get top performing players for a team',
+          params: { teamAbv: 'e.g. NYY, LAD, BOS' },
         },
       ],
       players: [
         {
-          method: "GET",
-          path: "/api/players",
-          description: "Get all players across all teams",
+          method: 'GET',
+          path: '/api/players',
+          description: 'Get all players across all teams',
           params: null,
         },
         {
-          method: "GET",
-          path: "/api/players/:playerId",
-          description: "Get a single player by MLB player ID",
-          params: { playerId: "e.g. 592450 (Aaron Judge)" },
+          method: 'GET',
+          path: '/api/players/:playerId',
+          description: 'Get a single player by MLB player ID',
+          params: { playerId: 'e.g. 592450 (Aaron Judge)' },
+        },
+        {
+          method: 'GET',
+          path: '/api/players/league-leaders',
+          description:
+            'Get top 5 qualified leaders in key hitting and pitching categories',
+          params: null,
         },
       ],
       data: [
         {
-          method: "POST",
-          path: "/api/data/update-teams",
-          description: "Manually trigger a teams + standings sync from MLB API to Supabase",
+          method: 'POST',
+          path: '/api/data/update-teams',
+          description:
+            'Manually trigger a teams + standings sync from MLB API to Supabase',
           params: null,
         },
         {
-          method: "POST",
-          path: "/api/data/update-rosters",
-          description: "Manually trigger a full player + stats sync from MLB API to Supabase",
+          method: 'POST',
+          path: '/api/data/update-rosters',
+          description:
+            'Manually trigger a full player + stats sync from MLB API to Supabase',
           params: null,
         },
       ],
     },
     cron_jobs: [
       {
-        schedule: "0 3 * * *",
-        timezone: "America/New_York",
-        jobs: ["update-teams", "update-rosters"],
-        description: "Automatically syncs all teams and player data from MLB API every day at 3:00 AM ET",
+        schedule: '0 3 * * *',
+        timezone: 'America/New_York',
+        jobs: ['update-teams', 'update-rosters'],
+        description:
+          'Automatically syncs all teams and player data from MLB API every day at 3:00 AM ET',
       },
     ],
   });

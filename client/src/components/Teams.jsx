@@ -2,48 +2,72 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { fetchTeams } from "../services/api";
 
+// Full division names from the API, sorted East → Central → West
+const DIVISION_ORDER = ["East", "Central", "West"];
+
+const divisionSuffix = (divName) => divName?.split(" ").pop() ?? "";
+
+const groupTeams = (teams) => {
+  const leagues = { AL: {}, NL: {} };
+  teams.forEach((team) => {
+    const lg = team.league_abv;
+    if (!leagues[lg]) return;
+    const div = divisionSuffix(team.division);
+    if (!leagues[lg][div]) leagues[lg][div] = [];
+    leagues[lg][div].push(team);
+  });
+  return leagues;
+};
+
 const Teams = () => {
   const [teamsData, setTeamsData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getTeams = async () => {
-      const data = await fetchTeams();
-      setTeamsData(data);
+    fetchTeams().then((data) => {
+      if (data) setTeamsData(data);
       setLoading(false);
-    };
-
-    getTeams();
+    });
   }, []);
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center max-w-screen-lg gap-4 mx-auto mt-20">
-        <div className="w-10 h-10 border-4 border-blue-500 rounded-full animate-spin border-t-transparent" />
-        <p className="text-lg font-semibold text-gray-700">Loading...</p>
+      <div className="flex justify-center py-4">
+        <div className="w-5 h-5 border-2 border-blue-400 rounded-full animate-spin border-t-transparent" />
       </div>
     );
   }
 
+  const leagues = groupTeams(teamsData);
+
   return (
-    <div className="max-w-screen-lg px-4 py-8 mx-auto">
-      <div className="grid items-center justify-center grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {teamsData.map(({ team_abv, city, name, logo }) => (
-          <Link
-            key={team_abv}
-            to={`/teams/${team_abv}`}
-            className="flex items-center justify-center"
-          >
-            <div className="flex items-center justify-center w-24 h-24 p-2 overflow-hidden transition-transform duration-300 bg-white hover:scale-110">
-              <img
-                src={logo}
-                alt={`${city} ${name}`}
-                className="object-cover max-w-full max-h-full"
-              />
-            </div>
-          </Link>
-        ))}
-      </div>
+    <div className="space-y-3">
+      {["AL", "NL"].map((lg) => (
+        <div key={lg}>
+          <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1.5">
+            {lg === "AL" ? "American League" : "National League"}
+          </p>
+          {/* 15 logos per row: 5 teams × 3 divisions */}
+          <div className="grid grid-cols-15 gap-1" style={{ gridTemplateColumns: "repeat(15, minmax(0, 1fr))" }}>
+            {DIVISION_ORDER.flatMap((div) =>
+              (leagues[lg][div] ?? []).map((team) => (
+                <Link
+                  key={team.team_abv}
+                  to={`/teams/${team.team_abv}`}
+                  title={`${team.city} ${team.name}`}
+                  className="group flex items-center justify-center aspect-square p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <img
+                    src={team.logo}
+                    alt={`${team.city} ${team.name}`}
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-200"
+                  />
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
