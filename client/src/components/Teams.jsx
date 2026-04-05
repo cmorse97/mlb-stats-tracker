@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { fetchTeams } from "../services/api";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { fetchTeams } from '../services/api';
+import Loading from './Loading';
 
 // Full division names from the API, sorted East → Central → West
-const DIVISION_ORDER = ["East", "Central", "West"];
+const DIVISION_ORDER = ['East', 'Central', 'West'];
 
-const divisionSuffix = (divName) => divName?.split(" ").pop() ?? "";
+const divisionSuffix = (divName) => divName?.split(' ').pop() ?? '';
 
 const groupTeams = (teams) => {
   const leagues = { AL: {}, NL: {} };
@@ -33,7 +34,7 @@ const Teams = () => {
   if (loading) {
     return (
       <div className="flex justify-center py-4">
-        <div className="w-5 h-5 border-2 border-blue-400 rounded-full animate-spin border-t-transparent" />
+        <Loading />
       </div>
     );
   }
@@ -42,13 +43,13 @@ const Teams = () => {
 
   return (
     <div className="space-y-3">
-      {["AL", "NL"].map((lg) => (
+      {['AL', 'NL'].map((lg) => (
         <div key={lg}>
           <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1.5">
-            {lg === "AL" ? "American League" : "National League"}
+            {lg === 'AL' ? 'American League' : 'National League'}
           </p>
           {/* 15 logos per row: 5 teams × 3 divisions */}
-          <div className="grid grid-cols-15 gap-1" style={{ gridTemplateColumns: "repeat(15, minmax(0, 1fr))" }}>
+          <div className="grid grid-cols-5 sm:grid-cols-15 gap-0.5 sm:gap-1">
             {DIVISION_ORDER.flatMap((div) =>
               (leagues[lg][div] ?? []).map((team) => (
                 <Link
@@ -60,10 +61,10 @@ const Teams = () => {
                   <img
                     src={team.logo}
                     alt={`${team.city} ${team.name}`}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-200"
+                    className="w-12 h-12 sm:w-full sm:h-full object-contain group-hover:scale-110 transition-transform duration-200"
                   />
                 </Link>
-              ))
+              )),
             )}
           </div>
         </div>

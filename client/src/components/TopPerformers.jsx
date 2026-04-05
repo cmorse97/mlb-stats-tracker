@@ -48,8 +48,9 @@ const TopPerformers = () => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="px-4 pt-3 pb-0">
+      <div className="px-4 pt-3 pb-0 flex items-center justify-between">
         <h2 className="text-sm font-bold text-gray-800 tracking-wide uppercase">Team Leaders</h2>
+        <span className="text-[10px] font-medium text-gray-400 tracking-wide">Qualified only</span>
       </div>
 
       {/* Tabs */}
@@ -79,7 +80,7 @@ const TopPerformers = () => {
             <div className="w-5 h-5 border-2 border-blue-400 rounded-full animate-spin border-t-transparent" />
           </div>
         ) : (
-          players?.map((player, i) => (
+          players?.filter(Boolean).map((player, i) => (
             <LeaderRow key={i} player={player} teamAbv={teamAbv} />
           ))
         )}

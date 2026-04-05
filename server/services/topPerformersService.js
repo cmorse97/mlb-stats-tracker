@@ -10,232 +10,79 @@ const parseStatLowIsBetter = (val) => {
   return isNaN(num) ? Infinity : num;
 };
 
+const fmt = (player, stat, value) =>
+  player
+    ? { player_id: player.player_id, name: player.name, avatar: player.avatar, stat, value }
+    : null;
+
 export const getTopPerformersByTeamAbv = async (teamAbv) => {
-  // Fetch roster
-  const { data: players, error } = await supabase
-    .from('players')
-    .select('*')
-    .eq('team_abv', teamAbv);
+  const [playersRes, teamsRes] = await Promise.all([
+    supabase.from('players').select('*').eq('team_abv', teamAbv),
+    supabase.from('teams').select('wins, losses'),
+  ]);
 
-  if (error) throw error;
+  if (playersRes.error) throw playersRes.error;
+  if (teamsRes.error) throw teamsRes.error;
 
-  // Each key holds the full player object currently leading that stat category
+  const avgTeamGames = Math.round(
+    teamsRes.data.reduce((sum, t) => sum + parseInt(t.wins) + parseInt(t.losses), 0) /
+      teamsRes.data.length
+  );
+
+  const hitThreshold = 3.1 * avgTeamGames;
+  const pitchThreshold = 1.0 * avgTeamGames;
+
+  const players = playersRes.data;
+
+  const qualHitters = players.filter((p) => {
+    const h = p.stats?.Hitting;
+    return h && parseStat(h.atBats) + parseStat(h.baseOnBalls) >= hitThreshold;
+  });
+
+  const qualPitchers = players.filter((p) => {
+    const pit = p.stats?.Pitching;
+    return pit && parseFloat(pit.inningsPitched) >= pitchThreshold;
+  });
+
+  // Saves: no IP threshold (same as league leaders)
+  const allPitchers = players.filter((p) => p.stats?.Pitching);
+
+  const best = (arr, compareFn) => arr.reduce((leader, p) => compareFn(p, leader) ? p : leader, arr[0] ?? null);
+
   const hittingLeaders = {
-    hitsLeader: null,
-    hrLeader: null,
-    rbiLeader: null,
-    avgLeader: null,
-    opsLeader: null,
-    slgLeader: null,
+    hitsLeader:   best(qualHitters, (p, l) => !l || parseStat(p.stats.Hitting.hits)      > parseStat(l.stats.Hitting.hits)),
+    hrLeader:     best(qualHitters, (p, l) => !l || parseStat(p.stats.Hitting.homeRuns)   > parseStat(l.stats.Hitting.homeRuns)),
+    rbiLeader:    best(qualHitters, (p, l) => !l || parseStat(p.stats.Hitting.rbi)        > parseStat(l.stats.Hitting.rbi)),
+    avgLeader:    best(qualHitters, (p, l) => !l || parseStat(p.stats.Hitting.avg)        > parseStat(l.stats.Hitting.avg)),
+    opsLeader:    best(qualHitters, (p, l) => !l || parseStat(p.stats.Hitting.ops)        > parseStat(l.stats.Hitting.ops)),
+    slgLeader:    best(qualHitters, (p, l) => !l || parseStat(p.stats.Hitting.slg)        > parseStat(l.stats.Hitting.slg)),
   };
 
   const pitchingLeaders = {
-    winsLeader: null,
-    eraLeader: null,
-    strikeoutsLeader: null,
-    savesLeader: null,
-    whipLeader: null,
-    walksLeader: null,
+    winsLeader:        best(qualPitchers, (p, l) => !l || parseStat(p.stats.Pitching.wins)            > parseStat(l.stats.Pitching.wins)),
+    eraLeader:         best(qualPitchers, (p, l) => !l || parseStatLowIsBetter(p.stats.Pitching.era)  < parseStatLowIsBetter(l.stats.Pitching.era)),
+    strikeoutsLeader:  best(qualPitchers, (p, l) => !l || parseStat(p.stats.Pitching.strikeOuts)      > parseStat(l.stats.Pitching.strikeOuts)),
+    savesLeader:       best(allPitchers,  (p, l) => !l || parseStat(p.stats.Pitching.saves)           > parseStat(l.stats.Pitching.saves)),
+    whipLeader:        best(qualPitchers, (p, l) => !l || parseStatLowIsBetter(p.stats.Pitching.whip) < parseStatLowIsBetter(l.stats.Pitching.whip)),
+    walksLeader:       best(qualPitchers, (p, l) => !l || parseStatLowIsBetter(p.stats.Pitching.baseOnBalls) < parseStatLowIsBetter(l.stats.Pitching.baseOnBalls)),
   };
 
-  players.forEach((player) => {
-    const hittingStat = player.stats?.Hitting;
-    const pitchingStat = player.stats?.Pitching;
-
-    // Hitter: Hits, HR, RBI, AVG, OPS, SLG
-    if (hittingStat) {
-      if (
-        !hittingLeaders.hitsLeader ||
-        parseStat(hittingStat.hits) >
-          parseStat(hittingLeaders.hitsLeader.stats.Hitting.hits)
-      )
-        hittingLeaders.hitsLeader = player;
-
-      if (
-        !hittingLeaders.hrLeader ||
-        parseStat(hittingStat.homeRuns) >
-          parseStat(hittingLeaders.hrLeader.stats.Hitting.homeRuns)
-      )
-        hittingLeaders.hrLeader = player;
-
-      if (
-        !hittingLeaders.rbiLeader ||
-        parseStat(hittingStat.rbi) >
-          parseStat(hittingLeaders.rbiLeader.stats.Hitting.rbi)
-      )
-        hittingLeaders.rbiLeader = player;
-
-      if (
-        !hittingLeaders.avgLeader ||
-        parseStat(hittingStat.avg) >
-          parseStat(hittingLeaders.avgLeader.stats.Hitting.avg)
-      )
-        hittingLeaders.avgLeader = player;
-
-      if (
-        !hittingLeaders.opsLeader ||
-        parseStat(hittingStat.ops) >
-          parseStat(hittingLeaders.opsLeader.stats.Hitting.ops)
-      )
-        hittingLeaders.opsLeader = player;
-
-      if (
-        !hittingLeaders.slgLeader ||
-        parseStat(hittingStat.slg) >
-          parseStat(hittingLeaders.slgLeader.stats.Hitting.slg)
-      )
-        hittingLeaders.slgLeader = player;
-    }
-
-    // Pitcher: Wins, ERA (lower), SO, Saves, WHIP (lower), BB (lower)
-    if (pitchingStat) {
-      if (
-        !pitchingLeaders.winsLeader ||
-        parseStat(pitchingStat.wins) >
-          parseStat(pitchingLeaders.winsLeader.stats.Pitching.wins)
-      )
-        pitchingLeaders.winsLeader = player;
-
-      if (
-        !pitchingLeaders.eraLeader ||
-        parseStatLowIsBetter(pitchingStat.era) <
-          parseStatLowIsBetter(pitchingLeaders.eraLeader.stats.Pitching.era)
-      )
-        pitchingLeaders.eraLeader = player;
-
-      if (
-        !pitchingLeaders.strikeoutsLeader ||
-        parseStat(pitchingStat.strikeOuts) >
-          parseStat(pitchingLeaders.strikeoutsLeader.stats.Pitching.strikeOuts)
-      )
-        pitchingLeaders.strikeoutsLeader = player;
-
-      if (
-        !pitchingLeaders.savesLeader ||
-        parseStat(pitchingStat.saves) >
-          parseStat(pitchingLeaders.savesLeader.stats.Pitching.saves)
-      )
-        pitchingLeaders.savesLeader = player;
-
-      if (
-        !pitchingLeaders.whipLeader ||
-        parseStatLowIsBetter(pitchingStat.whip) <
-          parseStatLowIsBetter(pitchingLeaders.whipLeader.stats.Pitching.whip)
-      )
-        pitchingLeaders.whipLeader = player;
-
-      if (
-        !pitchingLeaders.walksLeader ||
-        parseStatLowIsBetter(pitchingStat.baseOnBalls) <
-          parseStatLowIsBetter(
-            pitchingLeaders.walksLeader.stats.Pitching.baseOnBalls,
-          )
-      )
-        pitchingLeaders.walksLeader = player;
-    }
-  });
-
-  // Guard: ensure we found at least one player for each category
-  const missingHitter = Object.entries(hittingLeaders).find(
-    ([, v]) => v === null,
-  );
-  const missingPitcher = Object.entries(pitchingLeaders).find(
-    ([, v]) => v === null,
-  );
-  if (missingHitter)
-    throw new Error(`No hitter found for stat: ${missingHitter[0]}`);
-  if (missingPitcher)
-    throw new Error(`No pitcher found for stat: ${missingPitcher[0]}`);
-
-  // Return formatted
   return {
     hitters: [
-      {
-        player_id: hittingLeaders.hitsLeader.player_id,
-        name: hittingLeaders.hitsLeader.name,
-        avatar: hittingLeaders.hitsLeader.avatar,
-        stat: 'Hits',
-        value: hittingLeaders.hitsLeader.stats?.Hitting.hits,
-      },
-      {
-        player_id: hittingLeaders.hrLeader.player_id,
-        name: hittingLeaders.hrLeader.name,
-        avatar: hittingLeaders.hrLeader.avatar,
-        stat: 'HR',
-        value: hittingLeaders.hrLeader.stats?.Hitting.homeRuns,
-      },
-      {
-        player_id: hittingLeaders.rbiLeader.player_id,
-        name: hittingLeaders.rbiLeader.name,
-        avatar: hittingLeaders.rbiLeader.avatar,
-        stat: 'RBI',
-        value: hittingLeaders.rbiLeader.stats?.Hitting.rbi,
-      },
-      {
-        player_id: hittingLeaders.avgLeader.player_id,
-        name: hittingLeaders.avgLeader.name,
-        avatar: hittingLeaders.avgLeader.avatar,
-        stat: 'AVG',
-        value: hittingLeaders.avgLeader.stats?.Hitting.avg,
-      },
-      {
-        player_id: hittingLeaders.opsLeader.player_id,
-        name: hittingLeaders.opsLeader.name,
-        avatar: hittingLeaders.opsLeader.avatar,
-        stat: 'OPS',
-        value: hittingLeaders.opsLeader.stats?.Hitting.ops,
-      },
-      {
-        player_id: hittingLeaders.slgLeader.player_id,
-        name: hittingLeaders.slgLeader.name,
-        avatar: hittingLeaders.slgLeader.avatar,
-        stat: 'SLG',
-        value: hittingLeaders.slgLeader.stats?.Hitting.slg,
-      },
+      fmt(hittingLeaders.hitsLeader,  'Hits', hittingLeaders.hitsLeader?.stats?.Hitting.hits),
+      fmt(hittingLeaders.hrLeader,    'HR',   hittingLeaders.hrLeader?.stats?.Hitting.homeRuns),
+      fmt(hittingLeaders.rbiLeader,   'RBI',  hittingLeaders.rbiLeader?.stats?.Hitting.rbi),
+      fmt(hittingLeaders.avgLeader,   'AVG',  hittingLeaders.avgLeader?.stats?.Hitting.avg),
+      fmt(hittingLeaders.opsLeader,   'OPS',  hittingLeaders.opsLeader?.stats?.Hitting.ops),
+      fmt(hittingLeaders.slgLeader,   'SLG',  hittingLeaders.slgLeader?.stats?.Hitting.slg),
     ],
     pitchers: [
-      {
-        player_id: pitchingLeaders.winsLeader.player_id,
-        name: pitchingLeaders.winsLeader.name,
-        avatar: pitchingLeaders.winsLeader.avatar,
-        stat: 'Wins',
-        value: pitchingLeaders.winsLeader.stats?.Pitching.wins,
-      },
-      {
-        player_id: pitchingLeaders.eraLeader.player_id,
-        name: pitchingLeaders.eraLeader.name,
-        avatar: pitchingLeaders.eraLeader.avatar,
-        stat: 'ERA',
-        value: pitchingLeaders.eraLeader.stats?.Pitching.era,
-      },
-      {
-        player_id: pitchingLeaders.strikeoutsLeader.player_id,
-        name: pitchingLeaders.strikeoutsLeader.name,
-        avatar: pitchingLeaders.strikeoutsLeader.avatar,
-        stat: 'SO',
-        value: pitchingLeaders.strikeoutsLeader.stats?.Pitching.strikeOuts,
-      },
-      {
-        player_id: pitchingLeaders.savesLeader.player_id,
-        name: pitchingLeaders.savesLeader.name,
-        avatar: pitchingLeaders.savesLeader.avatar,
-        stat: 'Saves',
-        value: pitchingLeaders.savesLeader.stats?.Pitching.saves,
-      },
-      {
-        player_id: pitchingLeaders.whipLeader.player_id,
-        name: pitchingLeaders.whipLeader.name,
-        avatar: pitchingLeaders.whipLeader.avatar,
-        stat: 'WHIP',
-        value: pitchingLeaders.whipLeader.stats?.Pitching.whip,
-      },
-      {
-        player_id: pitchingLeaders.walksLeader.player_id,
-        name: pitchingLeaders.walksLeader.name,
-        avatar: pitchingLeaders.walksLeader.avatar,
-        stat: 'BB',
-        value: pitchingLeaders.walksLeader.stats?.Pitching.baseOnBalls,
-      },
+      fmt(pitchingLeaders.winsLeader,       'Wins',  pitchingLeaders.winsLeader?.stats?.Pitching.wins),
+      fmt(pitchingLeaders.eraLeader,        'ERA',   pitchingLeaders.eraLeader?.stats?.Pitching.era),
+      fmt(pitchingLeaders.strikeoutsLeader, 'SO',    pitchingLeaders.strikeoutsLeader?.stats?.Pitching.strikeOuts),
+      fmt(pitchingLeaders.savesLeader,      'Saves', pitchingLeaders.savesLeader?.stats?.Pitching.saves),
+      fmt(pitchingLeaders.whipLeader,       'WHIP',  pitchingLeaders.whipLeader?.stats?.Pitching.whip),
+      fmt(pitchingLeaders.walksLeader,      'BB',    pitchingLeaders.walksLeader?.stats?.Pitching.baseOnBalls),
     ],
   };
 };
